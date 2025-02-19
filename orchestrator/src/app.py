@@ -12,14 +12,15 @@ import fraud_detection_pb2_grpc as fraud_detection_grpc
 
 import grpc
 
-def greet(name='you'):
+def check_fraud(request_data) -> fraud_detection.OrderRepsonse:
     # Establish a connection with the fraud-detection gRPC service.
     with grpc.insecure_channel('fraud_detection:50051') as channel:
         # Create a stub object.
-        stub = fraud_detection_grpc.HelloServiceStub(channel)
+        stub = fraud_detection_grpc.FraudServiceStub(channel)
         # Call the service through the stub object.
-        response = stub.SayHello(fraud_detection.HelloRequest(name=name))
-    return response.greeting
+        request = fraud_detection.OrderRequest(items=request_data.get('items', []))
+        response = stub.SayFraud(request)
+    return response
 
 # Import Flask.
 # Flask is a web framework for Python.
@@ -41,7 +42,11 @@ def index():
     Responds with 'Hello, [name]' when a GET request is made to '/' endpoint.
     """
     # Test the fraud-detection gRPC service.
-    response = greet(name='orchestrator')
+    response = check_fraud({
+        'items': [
+            {'name': 'Tere List', 'quantity': 543}
+        ]
+    })
     # Return the response.
     return response
 
