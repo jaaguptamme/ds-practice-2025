@@ -6,6 +6,24 @@ service HelloService {
     rpc SayHello (HelloRequest) returns (HelloResponse);
 }
 
+service FraudService {
+    rpc SayFraud (OrderRequest) returns (OrderRepsonse);
+}
+
+message Item {
+    string name = 1;
+    int32 quantity = 2;
+}
+
+message OrderRequest {
+    repeated Item items = 1;
+}
+
+message OrderRepsonse {
+    bool is_fraud = 1;
+    string message = 2;
+}
+
 message HelloRequest {
     string name = 1;
 }
