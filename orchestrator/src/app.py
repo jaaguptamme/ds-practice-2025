@@ -29,6 +29,7 @@ def check_fraud(request_data) -> fraud_detection.OrderRepsonse:
 from flask import Flask, request
 from flask_cors import CORS
 import json
+import concurrent.futures
 
 # Create a simple Flask app.
 app = Flask(__name__)
@@ -50,6 +51,15 @@ def index():
     # Return the response.
     return response
 
+def FraudVerificationSuggestions(request_data):
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        futures = [
+            executor.submit(check_fraud, request_data),
+            executor.submit(check_fraud, request_data)
+        ]
+        results=[future.result() for future in concurrent.futures.as_completed(futures)]
+    print(results)
+
 @app.route('/checkout', methods=['POST'])
 def checkout():
     """
@@ -59,7 +69,8 @@ def checkout():
     request_data = json.loads(request.data)
     # Print request object data
     #print("Request Data:", request_data.get('items'))
-    check_fraud_response = check_fraud(request_data)
+    print(FraudVerificationSuggestions(request_data))
+    #check_fraud_response = check_fraud(request_data)
     #print("Fraud Response:", check_fraud_response)
 
     # Dummy response following the provided YAML specification for the bookstore
