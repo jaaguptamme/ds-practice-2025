@@ -3,7 +3,7 @@
 import grpc
 import warnings
 
-import transactions_verification_pb2 as transactions__verification__pb2
+import transaction_verification_pb2 as transaction__verification__pb2
 
 GRPC_GENERATED_VERSION = '1.70.0'
 GRPC_VERSION = grpc.__version__
@@ -18,7 +18,7 @@ except ImportError:
 if _version_not_supported:
     raise RuntimeError(
         f'The grpc package installed is at version {GRPC_VERSION},'
-        + f' but the generated code in transactions_verification_pb2_grpc.py depends on'
+        + f' but the generated code in transaction_verification_pb2_grpc.py depends on'
         + f' grpcio>={GRPC_GENERATED_VERSION}.'
         + f' Please upgrade your grpc module to grpcio>={GRPC_GENERATED_VERSION}'
         + f' or downgrade your generated code using grpcio-tools<={GRPC_VERSION}.'
@@ -36,8 +36,8 @@ class VerificationServiceStub(object):
         """
         self.SayVerification = channel.unary_unary(
                 '/verification.VerificationService/SayVerification',
-                request_serializer=transactions__verification__pb2.TransactionRequest.SerializeToString,
-                response_deserializer=transactions__verification__pb2.TransactionRepsonse.FromString,
+                request_serializer=transaction__verification__pb2.TransactionRequest.SerializeToString,
+                response_deserializer=transaction__verification__pb2.TransactionRepsonse.FromString,
                 _registered_method=True)
 
 
@@ -55,8 +55,8 @@ def add_VerificationServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'SayVerification': grpc.unary_unary_rpc_method_handler(
                     servicer.SayVerification,
-                    request_deserializer=transactions__verification__pb2.TransactionRequest.FromString,
-                    response_serializer=transactions__verification__pb2.TransactionRepsonse.SerializeToString,
+                    request_deserializer=transaction__verification__pb2.TransactionRequest.FromString,
+                    response_serializer=transaction__verification__pb2.TransactionRepsonse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -84,8 +84,8 @@ class VerificationService(object):
             request,
             target,
             '/verification.VerificationService/SayVerification',
-            transactions__verification__pb2.TransactionRequest.SerializeToString,
-            transactions__verification__pb2.TransactionRepsonse.FromString,
+            transaction__verification__pb2.TransactionRequest.SerializeToString,
+            transaction__verification__pb2.TransactionRepsonse.FromString,
             options,
             channel_credentials,
             insecure,

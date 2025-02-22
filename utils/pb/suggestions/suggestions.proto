@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package suggestions;
+
+service SuggestionService {
+    rpc SaySuggest (OrderRequest) returns (OrderRepsonse);
+}
+
+message Item {
+    string name = 1;
+    int32 quantity = 2;
+}
+
+message OrderRequest {
+    repeated Item items = 1;
+}
+
+message OrderRepsonse {
+    string message = 1;
+}

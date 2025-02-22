@@ -58,7 +58,9 @@ def checkout():
     # Get request object data to json
     request_data = json.loads(request.data)
     # Print request object data
-    print("Request Data:", request_data.get('items'))
+    #print("Request Data:", request_data.get('items'))
+    check_fraud_response = check_fraud(request_data)
+    #print("Fraud Response:", check_fraud_response)
 
     # Dummy response following the provided YAML specification for the bookstore
     order_status_response = {
