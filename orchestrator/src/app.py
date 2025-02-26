@@ -1,3 +1,4 @@
+import random
 import sys
 import os
 
@@ -26,7 +27,10 @@ def check_fraud(request_data) -> fraud_detection.OrderRepsonse:
         response = stub.SayFraud(request)
     return response
 
-def get_suggestion(request_data) -> suggestions.OrderRepsonse :
+def get_verification(request_data) -> ...:
+    ...
+
+def get_suggestion(request_data) -> suggestions.OrderResponse:
     with grpc.insecure_channel('suggestions:50051') as channel:
         # Create a stub object.
         stub = suggestions_grpc.SuggestionServiceStub(channel)
@@ -66,12 +70,27 @@ def index():
 
 def FraudVerificationSuggestions(request_data):
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        futures = [
-            executor.submit(check_fraud, request_data),
-            executor.submit(get_suggestion, request_data)
-        ]
-        results=[future.result() for future in concurrent.futures.as_completed(futures)]
-    print(results)
+        fraud_future = executor.submit(check_fraud, request_data)
+        verification_future = executor.submit(get_verification, request_data)
+        suggestion_future = executor.submit(get_suggestion, request_data)
+        fraud_result = fraud_future.result()
+        verification_result = verification_future.result()
+        suggestions_result = suggestion_future.result()
+
+    order_id = str(random.randrange(0, 1_000_000_000))
+
+    if fraud_result.is_fraud:
+        return {
+            'orderId': order_id,
+            'status': 'Order Rejected',
+            'suggestedBooks': [],
+        }
+    
+    return {
+        'orderId': order_id,
+        'status': 'Order Accepted',
+        'suggestedBooks': [...],
+    }
 
 @app.route('/checkout', methods=['POST'])
 def checkout():
