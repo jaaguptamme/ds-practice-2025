@@ -46,7 +46,7 @@ def get_verification(request_data) -> transaction_verification.TransactionRespon
             expiration_date=request_data['creditCard']['expirationDate'],
             cvv=int(request_data['creditCard']['cvv']),
             billing_address=billing_address,
-            quantity=sum(item.quantity for item in request_data['items']),
+            quantity=sum(item['quantity'] for item in request_data['items']),
         )
         response = stub.SayVerification(request)
     return response
