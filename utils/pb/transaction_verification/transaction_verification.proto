@@ -6,7 +6,7 @@ service VerificationService {
     rpc SayVerification (TransactionRequest) returns (TransactionResponse);
 }
 
-message Item {
+message TransactionRequest {
     string name = 1; 
     string contact = 2;
     string credit_card_number = 3;
@@ -14,10 +14,6 @@ message Item {
     int32 cvv = 5;
     string billing_address = 6;
     int32 quantity = 7;
-}
-
-message TransactionRequest {
-    repeated Item items = 1;
 }
 
 message TransactionResponse {
