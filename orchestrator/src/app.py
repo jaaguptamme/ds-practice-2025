@@ -8,14 +8,19 @@ import os
 FILE = __file__ if '__file__' in globals() else os.getenv("PYTHONFILE", "")
 fraud_detection_grpc_path = os.path.abspath(os.path.join(FILE, '../../../utils/pb/fraud_detection'))
 sys.path.insert(0, fraud_detection_grpc_path)
+suggestions_grpc_path = os.path.abspath(os.path.join(FILE, '../../../utils/pb/transaction_verification'))
+sys.path.insert(0, suggestions_grpc_path)
 suggestions_grpc_path = os.path.abspath(os.path.join(FILE, '../../../utils/pb/suggestions'))
 sys.path.insert(0, suggestions_grpc_path)
 import fraud_detection_pb2 as fraud_detection
 import fraud_detection_pb2_grpc as fraud_detection_grpc
+import transaction_verification_pb2 as transaction_verification
+import transaction_verification_pb2_grpc as transaction_verification_grpc
 import suggestions_pb2 as suggestions
 import suggestions_pb2_grpc as suggestions_grpc
 
 import grpc
+from google.protobuf.json_format import MessageToDict
 
 def check_fraud(request_data) -> fraud_detection.OrderResponse:
     # Establish a connection with the fraud-detection gRPC service.
@@ -27,8 +32,24 @@ def check_fraud(request_data) -> fraud_detection.OrderResponse:
         response = stub.SayFraud(request)
     return response
 
-def get_verification(request_data) -> ...:
-    ...
+def get_verification(request_data) -> transaction_verification.TransactionResponse:
+    with grpc.insecure_channel('transaction_verification:50051') as channel:
+        # Create a stub object.
+        stub = transaction_verification_grpc.VerificationServiceStub(channel)
+        # Call the service through the stub object.
+        billing_address = request_data['billingAddress']
+        billing_address = f"{billing_address['street']}, {billing_address['zip']} {billing_address['city']}, {billing_address['state']} {billing_address['country']}"
+        request = transaction_verification.TransactionRequest(
+            name=request_data['user']['name'],
+            contact=request_data['user']['contanct'],
+            credit_card_number=request_data['creditCard']['number'],
+            expiration_date=request_data['creditCard']['expirationDate'],
+            cvv=int(request_data['creditCard']['cvv']),
+            billing_address=billing_address,
+            quantity=sum(item.quantity for item in request_data['items']),
+        )
+        response = stub.SayVerification(request)
+    return response
 
 def get_suggestion(request_data) -> suggestions.Suggestions:
     with grpc.insecure_channel('suggestions:50051') as channel:
@@ -85,11 +106,18 @@ def FraudVerificationSuggestions(request_data):
             'status': 'Order Rejected',
             'suggestedBooks': [],
         }
+
+    if not verification_result.is_verified:
+        return {
+            'orderId': order_id,
+            'status': 'Order Rejected',
+            'suggestedBooks': [],
+        }
     
     return {
         'orderId': order_id,
         'status': 'Order Accepted',
-        'suggestedBooks': [...],
+        'suggestedBooks': MessageToDict(suggestions_result)['books'],
     }
 
 @app.route('/checkout', methods=['POST'])
