@@ -13,18 +13,43 @@ import suggestions_pb2_grpc as suggestions_grpc
 import grpc
 from concurrent import futures
 
+existingBooks=[suggestions.Book(bookId='1',title="The Great Gatsby", author="F. Scott Fitzgerald"),
+                suggestions.Book(bookId='2',title="The Catcher in the Rye", author="J.D. Salinger"),
+                suggestions.Book(bookId='3',title="To Kill a Mockingbird", author="Harper Lee"),
+                suggestions.Book(bookId='4',title="1984", author="George Orwell"),
+                suggestions.Book(bookId='5',title="The Lord of the Rings", author="J.R.R. Tolkien"),
+                suggestions.Book(bookId='6',title="The Hobbit", author="J.R.R. Tolkien")]
+
+from difflib import SequenceMatcher
+
+def similar(a, b):
+    return SequenceMatcher(None, a, b).ratio()
+
+def findMostSimilarBooks(order: suggestions.OrderRequest):
+    similarBooks = []
+    for item in order.items:
+        mostSimilar=existingBooks[0]
+        for book in existingBooks:
+            if similar(book.title, item.name) > similar(mostSimilar.title, item.name):
+                mostSimilar=book
+        if mostSimilar in similarBooks:
+            continue
+        similarBooks.append(mostSimilar)
+    return similarBooks
+
 # Create a class to define the server functions, derived from
 # suggestions_pb2_grpc.HelloServiceServicer
 class SuggestionsService(suggestions_grpc.SuggestionServiceServicer):
     # Create an RPC function to say hello
     def SaySuggest(self, request, context):
         # Create a HelloResponse object
-        print("Request received",request)
+        print("Suggestion request received")
         response = suggestions.Suggestions()
         # Set the greeting field of the response object
-        response.books.append(suggestions.Book(bookId='1',title="The Great Gatsby", author="F. Scott Fitzgerald"))
+        response.books.extend(findMostSimilarBooks(request))
+        #response.books.append(suggestions.Book(bookId='1',title="The Great Gatsby", author="F. Scott Fitzgerald"))
         # Print the greeting message
-        print("Response sent",response)
+        print("Suggestion response sent")
         # Return the response object
         return response
 
