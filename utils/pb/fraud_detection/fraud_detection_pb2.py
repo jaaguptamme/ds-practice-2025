@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x15\x66raud_detection.proto\x12\x05\x66raud\"&\n\x04Item\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x10\n\x08quantity\x18\x02 \x01(\x05\"*\n\x0cOrderRequest\x12\x1a\n\x05items\x18\x01 \x03(\x0b\x32\x0b.fraud.Item\"2\n\rOrderRepsonse\x12\x10\n\x08is_fraud\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t2E\n\x0c\x46raudService\x12\x35\n\x08SayFraud\x12\x13.fraud.OrderRequest\x1a\x14.fraud.OrderRepsonseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x15\x66raud_detection.proto\x12\x05\x66raud\"&\n\x04Item\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x10\n\x08quantity\x18\x02 \x01(\x05\"*\n\x0cOrderRequest\x12\x1a\n\x05items\x18\x01 \x03(\x0b\x32\x0b.fraud.Item\"2\n\rOrderResponse\x12\x10\n\x08is_fraud\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t2E\n\x0c\x46raudService\x12\x35\n\x08SayFraud\x12\x13.fraud.OrderRequest\x1a\x14.fraud.OrderResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)

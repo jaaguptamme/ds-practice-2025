@@ -37,7 +37,7 @@ class VerificationServiceStub(object):
         self.SayVerification = channel.unary_unary(
                 '/verification.VerificationService/SayVerification',
                 request_serializer=transaction__verification__pb2.TransactionRequest.SerializeToString,
-                response_deserializer=transaction__verification__pb2.TransactionRepsonse.FromString,
+                response_deserializer=transaction__verification__pb2.TransactionResponse.FromString,
                 _registered_method=True)
 
 
@@ -56,7 +56,7 @@ def add_VerificationServiceServicer_to_server(servicer, server):
             'SayVerification': grpc.unary_unary_rpc_method_handler(
                     servicer.SayVerification,
                     request_deserializer=transaction__verification__pb2.TransactionRequest.FromString,
-                    response_serializer=transaction__verification__pb2.TransactionRepsonse.SerializeToString,
+                    response_serializer=transaction__verification__pb2.TransactionResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -85,7 +85,7 @@ class VerificationService(object):
             target,
             '/verification.VerificationService/SayVerification',
             transaction__verification__pb2.TransactionRequest.SerializeToString,
-            transaction__verification__pb2.TransactionRepsonse.FromString,
+            transaction__verification__pb2.TransactionResponse.FromString,
             options,
             channel_credentials,
             insecure,

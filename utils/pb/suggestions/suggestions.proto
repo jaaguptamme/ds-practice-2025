@@ -3,7 +3,7 @@ syntax = "proto3";
 package suggestions;
 
 service SuggestionService {
-    rpc SaySuggest (OrderRequest) returns (OrderRepsonse);
+    rpc SaySuggest (OrderRequest) returns (OrderResponse);
 }
 
 message Item {
@@ -15,6 +15,6 @@ message OrderRequest {
     repeated Item items = 1;
 }
 
-message OrderRepsonse {
+message OrderResponse {
     string message = 1;
 }

@@ -17,7 +17,7 @@ import suggestions_pb2_grpc as suggestions_grpc
 
 import grpc
 
-def check_fraud(request_data) -> fraud_detection.OrderRepsonse:
+def check_fraud(request_data) -> fraud_detection.OrderResponse:
     # Establish a connection with the fraud-detection gRPC service.
     with grpc.insecure_channel('fraud_detection:50051') as channel:
         # Create a stub object.

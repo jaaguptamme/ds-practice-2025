@@ -15,7 +15,7 @@ from concurrent import futures
 
 class FraudService(fraud_detection_grpc.FraudServiceServicer):
     def SayFraud(self, request: fraud_detection.OrderRequest, context):
-        response = fraud_detection.OrderRepsonse()
+        response = fraud_detection.OrderResponse()
         print("REQUEST",request)
         totalAmount=sum([item.quantity for item in request.items])
         if(len(request.items)>=10):

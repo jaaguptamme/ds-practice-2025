@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1etransaction_verification.proto\x12\x0cverification\"\x92\x01\n\x04Item\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0f\n\x07\x63ontact\x18\x02 \x01(\t\x12\x1a\n\x12\x63redit_card_number\x18\x03 \x01(\t\x12\x17\n\x0f\x65xpiration_date\x18\x04 \x01(\t\x12\x0b\n\x03\x63vv\x18\x05 \x01(\x05\x12\x17\n\x0f\x62illing_address\x18\x06 \x01(\t\x12\x10\n\x08quantity\x18\x07 \x01(\x05\"7\n\x12TransactionRequest\x12!\n\x05items\x18\x01 \x03(\x0b\x32\x12.verification.Item\";\n\x13TransactionRepsonse\x12\x13\n\x0bis_verified\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t2m\n\x13VerificationService\x12V\n\x0fSayVerification\x12 .verification.TransactionRequest\x1a!.verification.TransactionRepsonseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1etransaction_verification.proto\x12\x0cverification\"\x92\x01\n\x04Item\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0f\n\x07\x63ontact\x18\x02 \x01(\t\x12\x1a\n\x12\x63redit_card_number\x18\x03 \x01(\t\x12\x17\n\x0f\x65xpiration_date\x18\x04 \x01(\t\x12\x0b\n\x03\x63vv\x18\x05 \x01(\x05\x12\x17\n\x0f\x62illing_address\x18\x06 \x01(\t\x12\x10\n\x08quantity\x18\x07 \x01(\x05\"7\n\x12TransactionRequest\x12!\n\x05items\x18\x01 \x03(\x0b\x32\x12.verification.Item\";\n\x13TransactionResponse\x12\x13\n\x0bis_verified\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t2m\n\x13VerificationService\x12V\n\x0fSayVerification\x12 .verification.TransactionRequest\x1a!.verification.TransactionResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)

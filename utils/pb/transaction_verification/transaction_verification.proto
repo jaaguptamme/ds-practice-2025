@@ -3,7 +3,7 @@ syntax = "proto3";
 package verification;
 
 service VerificationService {
-    rpc SayVerification (TransactionRequest) returns (TransactionRepsonse);
+    rpc SayVerification (TransactionRequest) returns (TransactionResponse);
 }
 
 message Item {
@@ -20,7 +20,7 @@ message TransactionRequest {
     repeated Item items = 1;
 }
 
-message TransactionRepsonse {
+message TransactionResponse {
     bool is_verified = 1;
     string message = 2;
 }

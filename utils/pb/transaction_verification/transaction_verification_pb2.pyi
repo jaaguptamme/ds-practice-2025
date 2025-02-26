@@ -29,7 +29,7 @@ class TransactionRequest(_message.Message):
     items: _containers.RepeatedCompositeFieldContainer[Item]
     def __init__(self, items: _Optional[_Iterable[_Union[Item, _Mapping]]] = ...) -> None: ...
 
-class TransactionRepsonse(_message.Message):
+class TransactionResponse(_message.Message):
     __slots__ = ("is_verified", "message")
     IS_VERIFIED_FIELD_NUMBER: _ClassVar[int]
     MESSAGE_FIELD_NUMBER: _ClassVar[int]

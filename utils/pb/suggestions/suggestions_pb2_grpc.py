@@ -37,7 +37,7 @@ class SuggestionServiceStub(object):
         self.SaySuggest = channel.unary_unary(
                 '/suggestions.SuggestionService/SaySuggest',
                 request_serializer=suggestions__pb2.OrderRequest.SerializeToString,
-                response_deserializer=suggestions__pb2.OrderRepsonse.FromString,
+                response_deserializer=suggestions__pb2.OrderResponse.FromString,
                 _registered_method=True)
 
 
@@ -56,7 +56,7 @@ def add_SuggestionServiceServicer_to_server(servicer, server):
             'SaySuggest': grpc.unary_unary_rpc_method_handler(
                     servicer.SaySuggest,
                     request_deserializer=suggestions__pb2.OrderRequest.FromString,
-                    response_serializer=suggestions__pb2.OrderRepsonse.SerializeToString,
+                    response_serializer=suggestions__pb2.OrderResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -85,7 +85,7 @@ class SuggestionService(object):
             target,
             '/suggestions.SuggestionService/SaySuggest',
             suggestions__pb2.OrderRequest.SerializeToString,
-            suggestions__pb2.OrderRepsonse.FromString,
+            suggestions__pb2.OrderResponse.FromString,
             options,
             channel_credentials,
             insecure,

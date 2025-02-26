@@ -19,7 +19,7 @@ class SuggestionsService(suggestions_grpc.SuggestionServiceServicer):
     # Create an RPC function to say hello
     def SaySuggest(self, request, context):
         # Create a HelloResponse object
-        response = suggestions.OrderRepsonse()
+        response = suggestions.OrderResponse()
         # Set the greeting field of the response object
         response.message = "Hello, "
         # Print the greeting message

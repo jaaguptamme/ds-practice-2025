@@ -3,7 +3,7 @@ syntax = "proto3";
 package fraud;
 
 service FraudService {
-    rpc SayFraud (OrderRequest) returns (OrderRepsonse);
+    rpc SayFraud (OrderRequest) returns (OrderResponse);
 }
 
 message Item {
@@ -15,7 +15,7 @@ message OrderRequest {
     repeated Item items = 1;
 }
 
-message OrderRepsonse {
+message OrderResponse {
     bool is_fraud = 1;
     string message = 2;
 }

@@ -37,7 +37,7 @@ class FraudServiceStub(object):
         self.SayFraud = channel.unary_unary(
                 '/fraud.FraudService/SayFraud',
                 request_serializer=fraud__detection__pb2.OrderRequest.SerializeToString,
-                response_deserializer=fraud__detection__pb2.OrderRepsonse.FromString,
+                response_deserializer=fraud__detection__pb2.OrderResponse.FromString,
                 _registered_method=True)
 
 
@@ -56,7 +56,7 @@ def add_FraudServiceServicer_to_server(servicer, server):
             'SayFraud': grpc.unary_unary_rpc_method_handler(
                     servicer.SayFraud,
                     request_deserializer=fraud__detection__pb2.OrderRequest.FromString,
-                    response_serializer=fraud__detection__pb2.OrderRepsonse.SerializeToString,
+                    response_serializer=fraud__detection__pb2.OrderResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -85,7 +85,7 @@ class FraudService(object):
             target,
             '/fraud.FraudService/SayFraud',
             fraud__detection__pb2.OrderRequest.SerializeToString,
-            fraud__detection__pb2.OrderRepsonse.FromString,
+            fraud__detection__pb2.OrderResponse.FromString,
             options,
             channel_credentials,
             insecure,

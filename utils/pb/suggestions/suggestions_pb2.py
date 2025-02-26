@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x11suggestions.proto\x12\x0bsuggestions\"&\n\x04Item\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x10\n\x08quantity\x18\x02 \x01(\x05\"0\n\x0cOrderRequest\x12 \n\x05items\x18\x01 \x03(\x0b\x32\x11.suggestions.Item\" \n\rOrderRepsonse\x12\x0f\n\x07message\x18\x01 \x01(\t2X\n\x11SuggestionService\x12\x43\n\nSaySuggest\x12\x19.suggestions.OrderRequest\x1a\x1a.suggestions.OrderRepsonseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x11suggestions.proto\x12\x0bsuggestions\"&\n\x04Item\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x10\n\x08quantity\x18\x02 \x01(\x05\"0\n\x0cOrderRequest\x12 \n\x05items\x18\x01 \x03(\x0b\x32\x11.suggestions.Item\" \n\rOrderResponse\x12\x0f\n\x07message\x18\x01 \x01(\t2X\n\x11SuggestionService\x12\x43\n\nSaySuggest\x12\x19.suggestions.OrderRequest\x1a\x1a.suggestions.OrderResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
