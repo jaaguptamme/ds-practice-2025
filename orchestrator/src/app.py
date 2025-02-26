@@ -30,7 +30,7 @@ def check_fraud(request_data) -> fraud_detection.OrderResponse:
 def get_verification(request_data) -> ...:
     ...
 
-def get_suggestion(request_data) -> suggestions.OrderResponse:
+def get_suggestion(request_data) -> suggestions.Suggestions:
     with grpc.insecure_channel('suggestions:50051') as channel:
         # Create a stub object.
         stub = suggestions_grpc.SuggestionServiceStub(channel)

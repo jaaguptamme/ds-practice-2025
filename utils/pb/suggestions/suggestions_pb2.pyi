@@ -5,6 +5,16 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
+class Book(_message.Message):
+    __slots__ = ("bookId", "title", "author")
+    BOOKID_FIELD_NUMBER: _ClassVar[int]
+    TITLE_FIELD_NUMBER: _ClassVar[int]
+    AUTHOR_FIELD_NUMBER: _ClassVar[int]
+    bookId: str
+    title: str
+    author: str
+    def __init__(self, bookId: _Optional[str] = ..., title: _Optional[str] = ..., author: _Optional[str] = ...) -> None: ...
+
 class Item(_message.Message):
     __slots__ = ("name", "quantity")
     NAME_FIELD_NUMBER: _ClassVar[int]
@@ -19,8 +29,8 @@ class OrderRequest(_message.Message):
     items: _containers.RepeatedCompositeFieldContainer[Item]
     def __init__(self, items: _Optional[_Iterable[_Union[Item, _Mapping]]] = ...) -> None: ...
 
-class OrderResponse(_message.Message):
-    __slots__ = ("message",)
-    MESSAGE_FIELD_NUMBER: _ClassVar[int]
-    message: str
-    def __init__(self, message: _Optional[str] = ...) -> None: ...
+class Suggestions(_message.Message):
+    __slots__ = ("books",)
+    BOOKS_FIELD_NUMBER: _ClassVar[int]
+    books: _containers.RepeatedCompositeFieldContainer[Book]
+    def __init__(self, books: _Optional[_Iterable[_Union[Book, _Mapping]]] = ...) -> None: ...

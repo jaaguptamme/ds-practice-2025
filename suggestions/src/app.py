@@ -19,11 +19,12 @@ class SuggestionsService(suggestions_grpc.SuggestionServiceServicer):
     # Create an RPC function to say hello
     def SaySuggest(self, request, context):
         # Create a HelloResponse object
-        response = suggestions.OrderResponse()
+        print("Request received",request)
+        response = suggestions.Suggestions()
         # Set the greeting field of the response object
-        response.message = "Hello, "
+        response.books.append(suggestions.Book(bookId='1',title="The Great Gatsby", author="F. Scott Fitzgerald"))
         # Print the greeting message
-        print(response.message)
+        print("Response sent",response)
         # Return the response object
         return response
 
