@@ -13,6 +13,11 @@ import transaction_verification_pb2_grpc as transaction_verification_grpc
 import grpc
 from concurrent import futures
 
+def verify_credit_card(request: transaction_verification.TransactionRequest):
+    if len(request.cvv)!=3:
+        return False
+    return True
+
 # Create a class to define the server functions, derived from
 # transaction_verification_pb2_grpc.HelloServiceServicer
 class VerificationService(transaction_verification_grpc.VerificationServiceServicer):
@@ -21,7 +26,16 @@ class VerificationService(transaction_verification_grpc.VerificationServiceServi
         # Create a HelloResponse object
         response = transaction_verification.TransactionResponse()
         # Set the greeting field of the response object
-        response.message = "Hello, "
+        is_correct=True
+        if verify_credit_card(request)==False:
+            is_correct=False
+        
+        if is_correct:
+            response.message = "Hello, you are get verification"
+        else:
+            response.message = "Lick the pan"
+
+        response.is_verified=is_correct
         # Print the greeting message
         print(response.message)
         # Return the response object
