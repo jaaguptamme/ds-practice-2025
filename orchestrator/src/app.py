@@ -41,7 +41,7 @@ def get_verification(request_data) -> transaction_verification.TransactionRespon
         billing_address = f"{billing_address['street']}, {billing_address['zip']} {billing_address['city']}, {billing_address['state']} {billing_address['country']}"
         request = transaction_verification.TransactionRequest(
             name=request_data['user']['name'],
-            contact=request_data['user']['contanct'],
+            contact=request_data['user']['contact'],
             credit_card_number=request_data['creditCard']['number'],
             expiration_date=request_data['creditCard']['expirationDate'],
             cvv=int(request_data['creditCard']['cvv']),
