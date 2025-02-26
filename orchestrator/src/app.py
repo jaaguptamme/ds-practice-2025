@@ -7,8 +7,12 @@ import os
 FILE = __file__ if '__file__' in globals() else os.getenv("PYTHONFILE", "")
 fraud_detection_grpc_path = os.path.abspath(os.path.join(FILE, '../../../utils/pb/fraud_detection'))
 sys.path.insert(0, fraud_detection_grpc_path)
+suggestions_grpc_path = os.path.abspath(os.path.join(FILE, '../../../utils/pb/suggestions'))
+sys.path.insert(0, suggestions_grpc_path)
 import fraud_detection_pb2 as fraud_detection
 import fraud_detection_pb2_grpc as fraud_detection_grpc
+import suggestions_pb2 as suggestions
+import suggestions_pb2_grpc as suggestions_grpc
 
 import grpc
 
@@ -20,6 +24,15 @@ def check_fraud(request_data) -> fraud_detection.OrderRepsonse:
         # Call the service through the stub object.
         request = fraud_detection.OrderRequest(items=request_data.get('items', []))
         response = stub.SayFraud(request)
+    return response
+
+def get_suggestion(request_data) -> suggestions.OrderRepsonse :
+    with grpc.insecure_channel('suggestions:50051') as channel:
+        # Create a stub object.
+        stub = suggestions_grpc.SuggestionServiceStub(channel)
+        # Call the service through the stub object.
+        request = suggestions.OrderRequest(items=request_data.get('items', []))
+        response = stub.SaySuggest(request)
     return response
 
 # Import Flask.
@@ -55,7 +68,7 @@ def FraudVerificationSuggestions(request_data):
     with concurrent.futures.ThreadPoolExecutor() as executor:
         futures = [
             executor.submit(check_fraud, request_data),
-            executor.submit(check_fraud, request_data)
+            executor.submit(get_suggestion, request_data)
         ]
         results=[future.result() for future in concurrent.futures.as_completed(futures)]
     print(results)
