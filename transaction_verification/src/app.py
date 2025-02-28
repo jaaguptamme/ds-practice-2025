@@ -14,7 +14,9 @@ import grpc
 from concurrent import futures
 
 def verify_credit_card(request: transaction_verification.TransactionRequest):
-    if len(request.cvv)!=3:
+    if len(str(request.cvv))!=3:
+        return False
+    if len(str(request.credit_card_number))!=16:
         return False
     return True
 
