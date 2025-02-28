@@ -38,19 +38,14 @@ def findMostSimilarBooks(order: suggestions.OrderRequest):
     return similarBooks
 
 # Create a class to define the server functions, derived from
-# suggestions_pb2_grpc.HelloServiceServicer
+# suggestions_pb2_grpc.SuggestionServiceServicer
 class SuggestionsService(suggestions_grpc.SuggestionServiceServicer):
     # Create an RPC function to say hello
     def SaySuggest(self, request, context):
-        # Create a HelloResponse object
         print("Suggestion request received")
         response = suggestions.Suggestions()
-        # Set the greeting field of the response object
         response.books.extend(findMostSimilarBooks(request))
-        #response.books.append(suggestions.Book(bookId='1',title="The Great Gatsby", author="F. Scott Fitzgerald"))
-        # Print the greeting message
         print("Suggestion response sent")
-        # Return the response object
         return response
 
 def serve():
