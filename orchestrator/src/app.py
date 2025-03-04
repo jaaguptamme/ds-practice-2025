@@ -117,7 +117,7 @@ def FraudVerificationSuggestions(request_data):
     return {
         'orderId': order_id,
         'status': 'Order Approved',
-        'suggestedBooks': MessageToDict(suggestions_result)['books'],
+        'suggestedBooks': [MessageToDict(book) for book in suggestions_result.books],
     }
 
 @app.route('/checkout', methods=['POST'])
