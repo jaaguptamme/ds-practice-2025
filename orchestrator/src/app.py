@@ -116,7 +116,7 @@ def FraudVerificationSuggestions(request_data):
     
     return {
         'orderId': order_id,
-        'status': 'Order Accepted',
+        'status': 'Order Approved',
         'suggestedBooks': MessageToDict(suggestions_result)['books'],
     }
 
