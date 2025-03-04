@@ -127,21 +127,9 @@ def checkout():
     """
     # Get request object data to json
     request_data = json.loads(request.data)
-    # Print request object data
-    print("Checkout - Request Data:", request_data.get('items'))
-    print(FraudVerificationSuggestions(request_data))
-
-    # Dummy response following the provided YAML specification for the bookstore
-    order_status_response = {
-        'orderId': '12345',
-        'status': 'Order Approved',
-        'suggestedBooks': [
-            {'bookId': '123', 'title': 'The Best Book', 'author': 'Author 1'},
-            {'bookId': '456', 'title': 'The Second Best Book', 'author': 'Author 2'}
-        ]
-    }
-
-    return order_status_response
+    
+    # Make requests to other services and return response
+    return FraudVerificationSuggestions(request_data)
 
 
 if __name__ == '__main__':
