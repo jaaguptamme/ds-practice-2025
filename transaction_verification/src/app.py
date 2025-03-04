@@ -42,11 +42,11 @@ def verify_contact(request: transaction_verification.TransactionRequest):
     return valid
 
 # Create a class to define the server functions, derived from
-# transaction_verification_pb2_grpc.HelloServiceServicer
+# transaction_verification_pb2_grpc.VerificationServiceServicer
 class VerificationService(transaction_verification_grpc.VerificationServiceServicer):
     # Create an RPC function to say hello
     def SayVerification(self, request, context):
-        # Create a HelloResponse object
+        print("VerificationService - Request recieved")
         response = transaction_verification.TransactionResponse()
         # Set the greeting field of the response object
         is_correct=True
@@ -66,7 +66,7 @@ class VerificationService(transaction_verification_grpc.VerificationServiceServi
 
         response.is_verified=is_correct
         # Print the greeting message
-        print(response.message)
+        print("VerificationService - Response: " + response.message)
         # Return the response object
         return response
 

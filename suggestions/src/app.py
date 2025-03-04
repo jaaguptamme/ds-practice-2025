@@ -42,10 +42,10 @@ def findMostSimilarBooks(order: suggestions.OrderRequest):
 class SuggestionsService(suggestions_grpc.SuggestionServiceServicer):
     # Create an RPC function to say hello
     def SaySuggest(self, request, context):
-        print("Suggestion request received")
+        print("SuggestionsService - Request received")
         response = suggestions.Suggestions()
         response.books.extend(findMostSimilarBooks(request))
-        print("Suggestion response sent")
+        print("SuggestionsService - Response: " + str(response.books))
         return response
 
 def serve():
