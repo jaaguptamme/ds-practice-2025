@@ -103,20 +103,20 @@ def FraudVerificationSuggestions(request_data):
     if fraud_result.is_fraud:
         return {
             'orderId': order_id,
-            'status': 'Order Rejected',
+            'status': fraud_result.message,
             'suggestedBooks': [],
         }
 
     if not verification_result.is_verified:
         return {
             'orderId': order_id,
-            'status': 'Order Rejected',
+            'status': verification_result.message,
             'suggestedBooks': [],
         }
     
     return {
         'orderId': order_id,
-        'status': 'Order Accepted',
+        'status': 'Order Approved',
         'suggestedBooks': MessageToDict(suggestions_result)['books'],
     }
 
