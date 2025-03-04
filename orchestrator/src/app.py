@@ -103,14 +103,14 @@ def FraudVerificationSuggestions(request_data):
     if fraud_result.is_fraud:
         return {
             'orderId': order_id,
-            'status': fraud_result.message,
+            'status': f'Order Rejected: {fraud_result.message}',
             'suggestedBooks': [],
         }
 
     if not verification_result.is_verified:
         return {
             'orderId': order_id,
-            'status': verification_result.message,
+            'status': f'Order Rejected: {verification_result.message}',
             'suggestedBooks': [],
         }
     

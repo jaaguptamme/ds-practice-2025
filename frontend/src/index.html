@@ -73,16 +73,20 @@
     </div>
 
     <script>
-        const items = [
+        const initialItems = [
             { name: "Book A", quantity: 1 },
-            { name: "Book B", quantity: 2 }
+            { name: "Book B", quantity: 2 },
+            { name: "Book C", quantity: 3 },
         ];
 
         const itemListElement = document.getElementById('itemList');
-        items.forEach(item => {
+        initialItems.forEach((item, i) => {
             const li = document.createElement('li');
-            li.textContent = `${item.name} - Quantity: ${item.quantity}`;
-            li.className = "bg-gray-100 p-3 rounded-lg";
+            li.innerHTML = `<label for="name${i}" class=" text-sm font-medium text-gray-700">Name:</label>
+                <input type="text" id="name${i}" name="name${i}" value="${item.name}" class="w-1/2 border border-gray-300 rounded-lg p-2 mt-1">
+                <label for="quantity${i}" class=" text-sm font-medium text-gray-700">Quantity:</label>
+                <input type="number" id="quantity${i}" name="quantity${i}" min="0" value="${item.quantity}" required class="w-1/5 border border-gray-300 rounded-lg p-2 mt-1">`
+            // li.className = "bg-gray-100 p-3 rounded-lg";
             itemListElement.appendChild(li);
         });
 
@@ -101,7 +105,9 @@
                     cvv: formData.get('cvv'),
                 },
                 userComment: formData.get('userComment'),
-                items: items,
+                items: initialItems
+                    .map((_, i) => ({ name: formData.get(`name${i}`), quantity: Number(formData.get(`quantity${i}`)) }))
+                    .filter(item => item.name),
                 billingAddress: {
                     street: formData.get('billingStreet'),
                     city: formData.get('billingCity'),

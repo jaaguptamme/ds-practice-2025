@@ -25,8 +25,8 @@ class FraudService(fraud_detection_grpc.FraudServiceServicer):
             response.is_fraud = True
             response.message = "Ordered too many of the same item"
         else:
-            response.message = "Not fraud" 
             response.is_fraud = False
+            response.message = "Not fraud" 
         print("FraudService - Response: " + response.message)
         return response
 
