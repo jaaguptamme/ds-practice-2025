@@ -90,6 +90,8 @@ def index():
     return response
 
 def FraudVerificationSuggestions(request_data):
+    order_id = str(random.randrange(0, 1_000_000_000))
+
     with concurrent.futures.ThreadPoolExecutor() as executor:
         fraud_future = executor.submit(check_fraud, request_data)
         verification_future = executor.submit(get_verification, request_data)
@@ -97,9 +99,7 @@ def FraudVerificationSuggestions(request_data):
         fraud_result = fraud_future.result()
         verification_result = verification_future.result()
         suggestions_result = suggestion_future.result()
-
-    order_id = str(random.randrange(0, 1_000_000_000))
-
+    
     if fraud_result.is_fraud:
         return {
             'orderId': order_id,
