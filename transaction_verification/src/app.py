@@ -44,7 +44,46 @@ def verify_contact(request: transaction_verification.TransactionRequest):
 # Create a class to define the server functions, derived from
 # transaction_verification_pb2_grpc.VerificationServiceServicer
 class VerificationService(transaction_verification_grpc.VerificationServiceServicer):
-    # Create an RPC function to say hello
+    def __init__(self,svc_idx=0,total_svcs=3):
+        self.svc_idx=svc_idx
+        self.total_svcs=total_svcs
+        self.orders={}#orderId -> {data}
+    def initVerification(self,request, context=None):
+        order_id=request.order_id
+        data=request.transaction_request
+        print("SIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIN")
+        self.orders[order_id]={"data":data,"vc":[0]*self.total_svcs}
+        return transaction_verification.Empty()
+    def merge_and_incrment(self,local_vc,incoming_vc=0):
+        for i in range(self.total_svcs):
+            local_vc[i]=max(local_vc[i],incoming_vc[i])
+        local_vc[self.svc_idx]+=1
+    def SayVerification(self, request, context):
+        order_id=request.order_id
+        incoming_vc=request.vector_clock.clocks
+        entry = self.orders.get(order_id)
+        data = entry["data"]
+        self.merge_and_incrment(entry["vc"],incoming_vc)
+        response = transaction_verification.TransactionResponse()
+        # Set the greeting field of the response object
+        is_correct=True
+        response.message = "Hello, you are get verification"
+
+        if verify_contact(data)==False:
+            response.message = "Given contact should be valid email"
+            is_correct=False
+
+        if verify_credit_card(data)==False:
+            response.message = "Given credit card is not valid"
+            is_correct=False
+        
+        if verify_billing_address(data)==False:
+            response.message = "We don't take orders from that country"
+            is_correct=False
+
+        response.is_verified=is_correct
+        return response
+    '''# Create an RPC function to say hello
     def SayVerification(self, request, context):
         print("VerificationService - Request recieved")
         response = transaction_verification.TransactionResponse()
@@ -68,7 +107,7 @@ class VerificationService(transaction_verification_grpc.VerificationServiceServi
         # Print the greeting message
         print("VerificationService - Response: " + response.message)
         # Return the response object
-        return response
+        return response'''
 
 def serve():
     # Create a gRPC server

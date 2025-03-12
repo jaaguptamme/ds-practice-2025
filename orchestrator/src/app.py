@@ -32,7 +32,17 @@ def check_fraud(request_data) -> fraud_detection.OrderResponse:
         response = stub.SayFraud(request)
     return response
 
-def get_verification(request_data) -> transaction_verification.TransactionResponse:
+def get_verification(order_id) -> transaction_verification.TransactionResponse:
+    with grpc.insecure_channel('transaction_verification:50051') as channel:
+        # Create a stub object.
+        stub = transaction_verification_grpc.VerificationServiceStub(channel)
+        # Call the service through the stub object.
+        vector_clock = transaction_verification.VectorClock(clocks=[0,0,0])
+        request = transaction_verification.VerificationRequest(order_id=order_id, vector_clock=vector_clock)
+        response = stub.SayVerification(request)
+    return response
+
+def initTransaction(order_id, request_data):
     with grpc.insecure_channel('transaction_verification:50051') as channel:
         # Create a stub object.
         stub = transaction_verification_grpc.VerificationServiceStub(channel)
@@ -48,7 +58,8 @@ def get_verification(request_data) -> transaction_verification.TransactionRespon
             billing_address=billing_address,
             quantity=sum(item['quantity'] for item in request_data['items']),
         )
-        response = stub.SayVerification(request)
+        request = transaction_verification.InitRequest(order_id=order_id, transaction_request=request)
+        response = stub.initVerification(request)
     return response
 
 def get_suggestion(request_data) -> suggestions.Suggestions:
@@ -93,8 +104,12 @@ def FraudVerificationSuggestions(request_data):
     order_id = str(random.randrange(0, 1_000_000_000))
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
+        initTransactionFuture = executor.submit(initTransaction, order_id, request_data)
+        initTransactionFuture = initTransactionFuture.result()
+
+    with concurrent.futures.ThreadPoolExecutor() as executor:
         fraud_future = executor.submit(check_fraud, request_data)
-        verification_future = executor.submit(get_verification, request_data)
+        verification_future = executor.submit(get_verification, order_id)
         suggestion_future = executor.submit(get_suggestion, request_data)
         fraud_result = fraud_future.result()
         verification_result = verification_future.result()

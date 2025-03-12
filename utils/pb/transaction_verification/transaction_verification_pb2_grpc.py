@@ -36,8 +36,13 @@ class VerificationServiceStub(object):
         """
         self.SayVerification = channel.unary_unary(
                 '/verification.VerificationService/SayVerification',
-                request_serializer=transaction__verification__pb2.TransactionRequest.SerializeToString,
+                request_serializer=transaction__verification__pb2.VerificationRequest.SerializeToString,
                 response_deserializer=transaction__verification__pb2.TransactionResponse.FromString,
+                _registered_method=True)
+        self.initVerification = channel.unary_unary(
+                '/verification.VerificationService/initVerification',
+                request_serializer=transaction__verification__pb2.InitRequest.SerializeToString,
+                response_deserializer=transaction__verification__pb2.Empty.FromString,
                 _registered_method=True)
 
 
@@ -50,13 +55,24 @@ class VerificationServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def initVerification(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_VerificationServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'SayVerification': grpc.unary_unary_rpc_method_handler(
                     servicer.SayVerification,
-                    request_deserializer=transaction__verification__pb2.TransactionRequest.FromString,
+                    request_deserializer=transaction__verification__pb2.VerificationRequest.FromString,
                     response_serializer=transaction__verification__pb2.TransactionResponse.SerializeToString,
+            ),
+            'initVerification': grpc.unary_unary_rpc_method_handler(
+                    servicer.initVerification,
+                    request_deserializer=transaction__verification__pb2.InitRequest.FromString,
+                    response_serializer=transaction__verification__pb2.Empty.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -84,8 +100,35 @@ class VerificationService(object):
             request,
             target,
             '/verification.VerificationService/SayVerification',
-            transaction__verification__pb2.TransactionRequest.SerializeToString,
+            transaction__verification__pb2.VerificationRequest.SerializeToString,
             transaction__verification__pb2.TransactionResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def initVerification(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/verification.VerificationService/initVerification',
+            transaction__verification__pb2.InitRequest.SerializeToString,
+            transaction__verification__pb2.Empty.FromString,
             options,
             channel_credentials,
             insecure,
