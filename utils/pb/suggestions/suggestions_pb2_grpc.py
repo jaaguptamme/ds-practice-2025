@@ -36,8 +36,13 @@ class SuggestionServiceStub(object):
         """
         self.SaySuggest = channel.unary_unary(
                 '/suggestions.SuggestionService/SaySuggest',
-                request_serializer=suggestions__pb2.OrderRequest.SerializeToString,
+                request_serializer=suggestions__pb2.SuggestionRequest.SerializeToString,
                 response_deserializer=suggestions__pb2.Suggestions.FromString,
+                _registered_method=True)
+        self.initSuggestion = channel.unary_unary(
+                '/suggestions.SuggestionService/initSuggestion',
+                request_serializer=suggestions__pb2.InitRequest.SerializeToString,
+                response_deserializer=suggestions__pb2.Empty.FromString,
                 _registered_method=True)
 
 
@@ -50,13 +55,24 @@ class SuggestionServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def initSuggestion(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_SuggestionServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'SaySuggest': grpc.unary_unary_rpc_method_handler(
                     servicer.SaySuggest,
-                    request_deserializer=suggestions__pb2.OrderRequest.FromString,
+                    request_deserializer=suggestions__pb2.SuggestionRequest.FromString,
                     response_serializer=suggestions__pb2.Suggestions.SerializeToString,
+            ),
+            'initSuggestion': grpc.unary_unary_rpc_method_handler(
+                    servicer.initSuggestion,
+                    request_deserializer=suggestions__pb2.InitRequest.FromString,
+                    response_serializer=suggestions__pb2.Empty.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -84,8 +100,35 @@ class SuggestionService(object):
             request,
             target,
             '/suggestions.SuggestionService/SaySuggest',
-            suggestions__pb2.OrderRequest.SerializeToString,
+            suggestions__pb2.SuggestionRequest.SerializeToString,
             suggestions__pb2.Suggestions.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def initSuggestion(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/suggestions.SuggestionService/initSuggestion',
+            suggestions__pb2.InitRequest.SerializeToString,
+            suggestions__pb2.Empty.FromString,
             options,
             channel_credentials,
             insecure,

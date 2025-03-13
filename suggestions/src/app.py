@@ -40,11 +40,29 @@ def findMostSimilarBooks(order: suggestions.OrderRequest):
 # Create a class to define the server functions, derived from
 # suggestions_pb2_grpc.SuggestionServiceServicer
 class SuggestionsService(suggestions_grpc.SuggestionServiceServicer):
+    def __init__(self,svc_idx=0,total_svcs=3):
+        self.svc_idx=svc_idx
+        self.total_svcs=total_svcs
+        self.orders={}#orderId -> {data}
+    def initSuggestion(self,request, context=None):
+        order_id=request.order_id
+        data=request.order_request
+        print("HEEEEEEEEEEEEEEEEEEERE2")
+        self.orders[order_id]={"data":data,"vc":[0]*self.total_svcs}
+        return suggestions.Empty()
+    def merge_and_incrment(self,local_vc,incoming_vc=0):
+        for i in range(self.total_svcs):
+            local_vc[i]=max(local_vc[i],incoming_vc[i])
+        local_vc[self.svc_idx]+=1
     # Create an RPC function to say hello
     def SaySuggest(self, request, context):
+        order_id=request.order_id
+        incoming_vc=request.vector_clock.clocks
         print("SuggestionsService - Request received")
+        entry = self.orders.get(order_id)
+        self.merge_and_incrment(entry["vc"],incoming_vc)
         response = suggestions.Suggestions()
-        response.books.extend(findMostSimilarBooks(request))
+        response.books.extend(findMostSimilarBooks(entry["data"]))
         print("SuggestionsService - Response: " + str(response.books))
         return response
 
