@@ -5,6 +5,32 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
+class VectorClock(_message.Message):
+    __slots__ = ("clocks",)
+    CLOCKS_FIELD_NUMBER: _ClassVar[int]
+    clocks: _containers.RepeatedScalarFieldContainer[int]
+    def __init__(self, clocks: _Optional[_Iterable[int]] = ...) -> None: ...
+
+class InitRequest(_message.Message):
+    __slots__ = ("order_id", "order_request")
+    ORDER_ID_FIELD_NUMBER: _ClassVar[int]
+    ORDER_REQUEST_FIELD_NUMBER: _ClassVar[int]
+    order_id: str
+    order_request: OrderRequest
+    def __init__(self, order_id: _Optional[str] = ..., order_request: _Optional[_Union[OrderRequest, _Mapping]] = ...) -> None: ...
+
+class FraudRequest(_message.Message):
+    __slots__ = ("order_id", "vector_clock")
+    ORDER_ID_FIELD_NUMBER: _ClassVar[int]
+    VECTOR_CLOCK_FIELD_NUMBER: _ClassVar[int]
+    order_id: str
+    vector_clock: VectorClock
+    def __init__(self, order_id: _Optional[str] = ..., vector_clock: _Optional[_Union[VectorClock, _Mapping]] = ...) -> None: ...
+
+class Empty(_message.Message):
+    __slots__ = ()
+    def __init__(self) -> None: ...
+
 class Item(_message.Message):
     __slots__ = ("name", "quantity")
     NAME_FIELD_NUMBER: _ClassVar[int]
