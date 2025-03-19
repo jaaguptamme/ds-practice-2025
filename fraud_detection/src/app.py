@@ -14,11 +14,34 @@ import grpc
 from concurrent import futures
 
 class FraudService(fraud_detection_grpc.FraudServiceServicer):
-    def SayFraud(self, request: fraud_detection.OrderRequest, context):
+    def __init__(self,svc_idx=0,total_svcs=3):
+        self.svc_idx=svc_idx
+        self.total_svcs=total_svcs
+        self.orders={}#orderId -> {data}
+
+    def InitVerification(self,request: fraud_detection.InitRequest, context=None):
+        order_id=request.order_id
+        data=request.order_request
+        self.orders[order_id]={"data":data,"vc":[0]*self.total_svcs}
+        return fraud_detection.Empty()
+
+    def merge_and_incrment(self,local_vc,incoming_vc=0):
+        for i in range(self.total_svcs):
+            local_vc[i]=max(local_vc[i],incoming_vc[i])
+        local_vc[self.svc_idx]+=1
+
+    def SayFraud(self, request: fraud_detection.FraudRequest, context):
+        print(f"FraudService - Request recieved - {request.vector_clock.clocks}")
+        
+        order_id=request.order_id
+        incoming_vc=request.vector_clock.clocks
+        entry = self.orders[order_id]
+        data = entry["data"]
+        self.merge_and_incrment(entry["vc"],incoming_vc)
+
         response = fraud_detection.OrderResponse()
-        print("FraudService - Request recieved")
-        totalAmount=sum([item.quantity for item in request.items])
-        if(len(request.items)>=10):
+        totalAmount=sum([item.quantity for item in data.items])
+        if(len(data.items)>=10):
             response.is_fraud = True
             response.message = "Ordered too many items"
         elif(totalAmount>=10):

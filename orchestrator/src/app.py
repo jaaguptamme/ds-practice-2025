@@ -22,13 +22,14 @@ import suggestions_pb2_grpc as suggestions_grpc
 import grpc
 from google.protobuf.json_format import MessageToDict
 
-def check_fraud(request_data) -> fraud_detection.OrderResponse:
+def check_fraud(order_id) -> fraud_detection.OrderResponse:
     # Establish a connection with the fraud-detection gRPC service.
     with grpc.insecure_channel('fraud_detection:50051') as channel:
         # Create a stub object.
         stub = fraud_detection_grpc.FraudServiceStub(channel)
         # Call the service through the stub object.
-        request = fraud_detection.OrderRequest(items=request_data.get('items', []))
+        vector_clock = fraud_detection.VectorClock(clocks=[0,0,0])
+        request = fraud_detection.FraudRequest(order_id=order_id, vector_clock=vector_clock)
         response = stub.SayFraud(request)
     return response
 
@@ -60,6 +61,15 @@ def initTransaction(order_id, request_data):
         )
         request = transaction_verification.InitRequest(order_id=order_id, transaction_request=request)
         response = stub.initVerification(request)
+    
+    with grpc.insecure_channel('fraud_detection:50051<') as channel:
+        # Create a stub object.
+        stub = fraud_detection_grpc.FraudServiceStub(channel)
+        # Call the service through the stub object.
+        request = fraud_detection.OrderRequest(items=request_data.get('items', []))
+        request = fraud_detection.InitRequest(order_id=order_id, order_request=request)
+        response = stub.InitVerification(request)
+
     return response
 
 def get_suggestion(order_id) -> suggestions.Suggestions:
@@ -96,21 +106,6 @@ app = Flask(__name__)
 # Enable CORS for the app.
 CORS(app, resources={r'/*': {'origins': '*'}})
 
-# Define a GET endpoint.
-@app.route('/', methods=['GET'])
-def index():
-    """
-    Responds with 'Hello, [name]' when a GET request is made to '/' endpoint.
-    """
-    # Test the fraud-detection gRPC service.
-    response = check_fraud({
-        'items': [
-            {'name': 'Tere List', 'quantity': 543}
-        ]
-    })
-    # Return the response.
-    return response
-
 def FraudVerificationSuggestions(request_data):
     order_id = str(random.randrange(0, 1_000_000_000))
 
@@ -123,7 +118,7 @@ def FraudVerificationSuggestions(request_data):
     print("WORKS THROUGH INITIALIZATION")  
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        fraud_future = executor.submit(check_fraud, request_data)
+        fraud_future = executor.submit(check_fraud, order_id)
         verification_future = executor.submit(get_verification, order_id)
         suggestion_future = executor.submit(get_suggestion, order_id)
         fraud_result = fraud_future.result()
