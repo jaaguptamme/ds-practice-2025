@@ -1,3 +1,4 @@
+import common_pb2 as _common_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
@@ -10,10 +11,6 @@ class VectorClock(_message.Message):
     CLOCKS_FIELD_NUMBER: _ClassVar[int]
     clocks: _containers.RepeatedScalarFieldContainer[int]
     def __init__(self, clocks: _Optional[_Iterable[int]] = ...) -> None: ...
-
-class Empty(_message.Message):
-    __slots__ = ()
-    def __init__(self) -> None: ...
 
 class InitRequest(_message.Message):
     __slots__ = ("order_id", "order_request")

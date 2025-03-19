@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package suggestions;
 
-import "common/common.proto"; // Correct relative path
+import "common.proto";
 
 service SuggestionService {
     rpc SaySuggest (common.Request) returns (Suggestions);

@@ -1,3 +1,4 @@
+import common_pb2 as _common_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
@@ -26,10 +27,6 @@ class VerificationRequest(_message.Message):
     order_id: str
     vector_clock: VectorClock
     def __init__(self, order_id: _Optional[str] = ..., vector_clock: _Optional[_Union[VectorClock, _Mapping]] = ...) -> None: ...
-
-class Empty(_message.Message):
-    __slots__ = ()
-    def __init__(self) -> None: ...
 
 class TransactionRequest(_message.Message):
     __slots__ = ("name", "contact", "credit_card_number", "expiration_date", "cvv", "billing_address", "quantity")

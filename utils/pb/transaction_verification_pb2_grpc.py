@@ -3,7 +3,8 @@
 import grpc
 import warnings
 
-import suggestions_pb2 as suggestions__pb2
+import common_pb2 as common__pb2
+import transaction_verification_pb2 as transaction__verification__pb2
 
 GRPC_GENERATED_VERSION = '1.70.0'
 GRPC_VERSION = grpc.__version__
@@ -18,14 +19,14 @@ except ImportError:
 if _version_not_supported:
     raise RuntimeError(
         f'The grpc package installed is at version {GRPC_VERSION},'
-        + f' but the generated code in suggestions_pb2_grpc.py depends on'
+        + f' but the generated code in transaction_verification_pb2_grpc.py depends on'
         + f' grpcio>={GRPC_GENERATED_VERSION}.'
         + f' Please upgrade your grpc module to grpcio>={GRPC_GENERATED_VERSION}'
         + f' or downgrade your generated code using grpcio-tools<={GRPC_VERSION}.'
     )
 
 
-class SuggestionServiceStub(object):
+class VerificationServiceStub(object):
     """Missing associated documentation comment in .proto file."""
 
     def __init__(self, channel):
@@ -34,59 +35,59 @@ class SuggestionServiceStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.SaySuggest = channel.unary_unary(
-                '/suggestions.SuggestionService/SaySuggest',
-                request_serializer=suggestions__pb2.SuggestionRequest.SerializeToString,
-                response_deserializer=suggestions__pb2.Suggestions.FromString,
+        self.SayVerification = channel.unary_unary(
+                '/verification.VerificationService/SayVerification',
+                request_serializer=common__pb2.Request.SerializeToString,
+                response_deserializer=transaction__verification__pb2.TransactionResponse.FromString,
                 _registered_method=True)
-        self.initSuggestion = channel.unary_unary(
-                '/suggestions.SuggestionService/initSuggestion',
-                request_serializer=suggestions__pb2.InitRequest.SerializeToString,
-                response_deserializer=suggestions__pb2.Empty.FromString,
+        self.initVerification = channel.unary_unary(
+                '/verification.VerificationService/initVerification',
+                request_serializer=transaction__verification__pb2.InitRequest.SerializeToString,
+                response_deserializer=common__pb2.Empty.FromString,
                 _registered_method=True)
 
 
-class SuggestionServiceServicer(object):
+class VerificationServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
-    def SaySuggest(self, request, context):
+    def SayVerification(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def initSuggestion(self, request, context):
+    def initVerification(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
 
-def add_SuggestionServiceServicer_to_server(servicer, server):
+def add_VerificationServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'SaySuggest': grpc.unary_unary_rpc_method_handler(
-                    servicer.SaySuggest,
-                    request_deserializer=suggestions__pb2.SuggestionRequest.FromString,
-                    response_serializer=suggestions__pb2.Suggestions.SerializeToString,
+            'SayVerification': grpc.unary_unary_rpc_method_handler(
+                    servicer.SayVerification,
+                    request_deserializer=common__pb2.Request.FromString,
+                    response_serializer=transaction__verification__pb2.TransactionResponse.SerializeToString,
             ),
-            'initSuggestion': grpc.unary_unary_rpc_method_handler(
-                    servicer.initSuggestion,
-                    request_deserializer=suggestions__pb2.InitRequest.FromString,
-                    response_serializer=suggestions__pb2.Empty.SerializeToString,
+            'initVerification': grpc.unary_unary_rpc_method_handler(
+                    servicer.initVerification,
+                    request_deserializer=transaction__verification__pb2.InitRequest.FromString,
+                    response_serializer=common__pb2.Empty.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'suggestions.SuggestionService', rpc_method_handlers)
+            'verification.VerificationService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
-    server.add_registered_method_handlers('suggestions.SuggestionService', rpc_method_handlers)
+    server.add_registered_method_handlers('verification.VerificationService', rpc_method_handlers)
 
 
  # This class is part of an EXPERIMENTAL API.
-class SuggestionService(object):
+class VerificationService(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def SaySuggest(request,
+    def SayVerification(request,
             target,
             options=(),
             channel_credentials=None,
@@ -99,9 +100,9 @@ class SuggestionService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/suggestions.SuggestionService/SaySuggest',
-            suggestions__pb2.SuggestionRequest.SerializeToString,
-            suggestions__pb2.Suggestions.FromString,
+            '/verification.VerificationService/SayVerification',
+            common__pb2.Request.SerializeToString,
+            transaction__verification__pb2.TransactionResponse.FromString,
             options,
             channel_credentials,
             insecure,
@@ -113,7 +114,7 @@ class SuggestionService(object):
             _registered_method=True)
 
     @staticmethod
-    def initSuggestion(request,
+    def initVerification(request,
             target,
             options=(),
             channel_credentials=None,
@@ -126,9 +127,9 @@ class SuggestionService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/suggestions.SuggestionService/initSuggestion',
-            suggestions__pb2.InitRequest.SerializeToString,
-            suggestions__pb2.Empty.FromString,
+            '/verification.VerificationService/initVerification',
+            transaction__verification__pb2.InitRequest.SerializeToString,
+            common__pb2.Empty.FromString,
             options,
             channel_credentials,
             insecure,

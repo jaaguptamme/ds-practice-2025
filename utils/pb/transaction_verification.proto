@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package verification;
 
-import "common/common.proto";
+import "common.proto";
 
 service VerificationService {
     rpc SayVerification (common.Request) returns (TransactionResponse);
