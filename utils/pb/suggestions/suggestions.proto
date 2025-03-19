@@ -2,17 +2,15 @@ syntax = "proto3";
 
 package suggestions;
 
+import "common/common.proto"; // Correct relative path
+
 service SuggestionService {
-    rpc SaySuggest (SuggestionRequest) returns (Suggestions);
-    rpc initSuggestion (InitRequest) returns (Empty);
+    rpc SaySuggest (common.Request) returns (Suggestions);
+    rpc initSuggestion (InitRequest) returns (common.Empty);
 }
 
 message VectorClock {
     repeated uint32 clocks = 1;
-}
-
-message Empty {
-
 }
 
 message InitRequest {

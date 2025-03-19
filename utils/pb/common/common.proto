@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package common;
+
+message VectorClock {
+    repeated uint32 clocks = 1;
+}
+
+message Request {
+    string order_id = 1;
+    VectorClock vector_clock = 2;
+}
+
+message Empty {}

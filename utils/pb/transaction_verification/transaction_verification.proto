@@ -2,9 +2,11 @@ syntax = "proto3";
 
 package verification;
 
+import "common/common.proto";
+
 service VerificationService {
-    rpc SayVerification (VerificationRequest) returns (TransactionResponse);
-    rpc initVerification (InitRequest) returns (Empty);
+    rpc SayVerification (common.Request) returns (TransactionResponse);
+    rpc initVerification (InitRequest) returns (common.Empty);
 }
 
 message VectorClock {
@@ -19,10 +21,6 @@ message InitRequest {
 message VerificationRequest {
     string order_id = 1;
     VectorClock vector_clock = 2;
-}
-
-message Empty {
-
 }
 
 message TransactionRequest {
