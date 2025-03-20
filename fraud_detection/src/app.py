@@ -7,6 +7,7 @@ import os
 FILE = __file__ if '__file__' in globals() else os.getenv("PYTHONFILE", "")
 grpc_path = os.path.abspath(os.path.join(FILE, '../../../utils/pb'))
 sys.path.insert(0, grpc_path)
+import common_pb2 as common
 import fraud_detection_pb2 as fraud_detection
 import fraud_detection_pb2_grpc as fraud_detection_grpc
 
@@ -23,14 +24,14 @@ class FraudService(fraud_detection_grpc.FraudServiceServicer):
         order_id=request.order_id
         data=request.order_request
         self.orders[order_id]={"data":data,"vc":[0]*self.total_svcs}
-        return fraud_detection.Empty()
+        return common.Empty()
 
     def merge_and_incrment(self,local_vc,incoming_vc=0):
         for i in range(self.total_svcs):
             local_vc[i]=max(local_vc[i],incoming_vc[i])
         local_vc[self.svc_idx]+=1
 
-    def SayFraud(self, request: fraud_detection.FraudRequest, context):
+    def SayFraud(self, request: common.Request, context):
         print(f"FraudService - Request recieved - {request.vector_clock.clocks}")
         
         order_id=request.order_id

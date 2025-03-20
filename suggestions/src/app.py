@@ -7,6 +7,7 @@ import os
 FILE = __file__ if '__file__' in globals() else os.getenv("PYTHONFILE", "")
 grpc_path = os.path.abspath(os.path.join(FILE, '../../../utils/pb'))
 sys.path.insert(0, grpc_path)
+import common_pb2 as common
 import suggestions_pb2 as suggestions
 import suggestions_pb2_grpc as suggestions_grpc
 
@@ -49,7 +50,7 @@ class SuggestionsService(suggestions_grpc.SuggestionServiceServicer):
         data=request.order_request
         print("HEEEEEEEEEEEEEEEEEEERE2")
         self.orders[order_id]={"data":data,"vc":[0]*self.total_svcs}
-        return suggestions.Empty()
+        return common.Empty()
     def merge_and_incrment(self,local_vc,incoming_vc=0):
         for i in range(self.total_svcs):
             local_vc[i]=max(local_vc[i],incoming_vc[i])

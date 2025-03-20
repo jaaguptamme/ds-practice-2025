@@ -7,6 +7,7 @@ import os
 FILE = __file__ if '__file__' in globals() else os.getenv("PYTHONFILE", "")
 grpc_path = os.path.abspath(os.path.join(FILE, '../../../utils/pb'))
 sys.path.insert(0, grpc_path)
+import common_pb2 as common
 import transaction_verification_pb2 as transaction_verification
 import transaction_verification_pb2_grpc as transaction_verification_grpc
 
@@ -53,7 +54,7 @@ class VerificationService(transaction_verification_grpc.VerificationServiceServi
         data=request.transaction_request
         print("HEEEEEEEEEEEEEEEEEEERE")
         self.orders[order_id]={"data":data,"vc":[0]*self.total_svcs}
-        return transaction_verification.Empty()
+        return common.Empty()
     def merge_and_incrment(self,local_vc,incoming_vc=0):
         for i in range(self.total_svcs):
             local_vc[i]=max(local_vc[i],incoming_vc[i])

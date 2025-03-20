@@ -8,6 +8,7 @@ import os
 FILE = __file__ if '__file__' in globals() else os.getenv("PYTHONFILE", "")
 grpc_path = os.path.abspath(os.path.join(FILE, '../../../utils/pb'))
 sys.path.insert(0, grpc_path)
+import common_pb2 as common
 import fraud_detection_pb2 as fraud_detection
 import fraud_detection_pb2_grpc as fraud_detection_grpc
 import transaction_verification_pb2 as transaction_verification
@@ -24,8 +25,8 @@ def check_fraud(order_id) -> fraud_detection.OrderResponse:
         # Create a stub object.
         stub = fraud_detection_grpc.FraudServiceStub(channel)
         # Call the service through the stub object.
-        vector_clock = fraud_detection.VectorClock(clocks=[0,0,0])
-        request = fraud_detection.FraudRequest(order_id=order_id, vector_clock=vector_clock)
+        vector_clock = common.VectorClock(clocks=[0,0,0])
+        request = common.Request(order_id=order_id, vector_clock=vector_clock)
         response = stub.SayFraud(request)
     return response
 
@@ -34,8 +35,8 @@ def get_verification(order_id) -> transaction_verification.TransactionResponse:
         # Create a stub object.
         stub = transaction_verification_grpc.VerificationServiceStub(channel)
         # Call the service through the stub object.
-        vector_clock = transaction_verification.VectorClock(clocks=[0,0,0])
-        request = transaction_verification.VerificationRequest(order_id=order_id, vector_clock=vector_clock)
+        vector_clock = common.VectorClock(clocks=[0,0,0])
+        request = common.Request(order_id=order_id, vector_clock=vector_clock)
         response = stub.SayVerification(request)
     return response
 
@@ -73,8 +74,8 @@ def get_suggestion(order_id) -> suggestions.Suggestions:
         # Create a stub object.
         stub = suggestions_grpc.SuggestionServiceStub(channel)
         # Call the service through the stub object.
-        vector_clock = transaction_verification.VectorClock(clocks=[0,0,0])
-        request = transaction_verification.VerificationRequest(order_id=order_id, vector_clock=vector_clock)
+        vector_clock = common.VectorClock(clocks=[0,0,0])
+        request = common.Request(order_id=order_id, vector_clock=vector_clock)
         response = stub.SaySuggest(request)
     return response
 
