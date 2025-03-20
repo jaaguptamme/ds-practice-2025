@@ -11,4 +11,9 @@ message Request {
     VectorClock vector_clock = 2;
 }
 
+message Response {
+    bool fail = 1;
+    VectorClock vector_clock = 2;
+}
+
 message Empty {}

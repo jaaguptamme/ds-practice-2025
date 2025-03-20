@@ -58,15 +58,15 @@ def initTransaction(order_id, request_data):
         )
         request = transaction_verification.InitRequest(order_id=order_id, transaction_request=request)
         response = stub.initVerification(request)
-    
-    with grpc.insecure_channel('fraud_detection:50051<') as channel:
+    return response
+def initFraudVerification(order_id, request_data):
+    with grpc.insecure_channel('fraud_detection:50051') as channel:
         # Create a stub object.
         stub = fraud_detection_grpc.FraudServiceStub(channel)
         # Call the service through the stub object.
         request = fraud_detection.OrderRequest(items=request_data.get('items', []))
         request = fraud_detection.InitRequest(order_id=order_id, order_request=request)
         response = stub.InitVerification(request)
-
     return response
 
 def get_suggestion(order_id) -> suggestions.Suggestions:
@@ -109,8 +109,10 @@ def FraudVerificationSuggestions(request_data):
     with concurrent.futures.ThreadPoolExecutor() as executor:
         initTransactionFuture = executor.submit(initTransaction, order_id, request_data)
         initSuggestionFuture = executor.submit(init_suggestion, order_id, request_data)
+        initFraudVerificationFuture = executor.submit(initFraudVerification, order_id, request_data)
         initTransactionFuture = initTransactionFuture.result()
-        initSuggestionFuture = initSuggestionFuture.result()   
+        initSuggestionFuture = initSuggestionFuture.result()
+        initFraudVerificationFuture = initFraudVerificationFuture.result()   
 
     print("WORKS THROUGH INITIALIZATION")  
 

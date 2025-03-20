@@ -19,6 +19,14 @@ class Request(_message.Message):
     vector_clock: VectorClock
     def __init__(self, order_id: _Optional[str] = ..., vector_clock: _Optional[_Union[VectorClock, _Mapping]] = ...) -> None: ...
 
+class Response(_message.Message):
+    __slots__ = ("fail", "vector_clock")
+    FAIL_FIELD_NUMBER: _ClassVar[int]
+    VECTOR_CLOCK_FIELD_NUMBER: _ClassVar[int]
+    fail: bool
+    vector_clock: VectorClock
+    def __init__(self, fail: bool = ..., vector_clock: _Optional[_Union[VectorClock, _Mapping]] = ...) -> None: ...
+
 class Empty(_message.Message):
     __slots__ = ()
     def __init__(self) -> None: ...

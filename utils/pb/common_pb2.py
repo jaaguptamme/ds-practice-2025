@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0c\x63ommon.proto\x12\x06\x63ommon\"\x1d\n\x0bVectorClock\x12\x0e\n\x06\x63locks\x18\x01 \x03(\r\"F\n\x07Request\x12\x10\n\x08order_id\x18\x01 \x01(\t\x12)\n\x0cvector_clock\x18\x02 \x01(\x0b\x32\x13.common.VectorClock\"\x07\n\x05\x45mptyb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0c\x63ommon.proto\x12\x06\x63ommon\"\x1d\n\x0bVectorClock\x12\x0e\n\x06\x63locks\x18\x01 \x03(\r\"F\n\x07Request\x12\x10\n\x08order_id\x18\x01 \x01(\t\x12)\n\x0cvector_clock\x18\x02 \x01(\x0b\x32\x13.common.VectorClock\"C\n\x08Response\x12\x0c\n\x04\x66\x61il\x18\x01 \x01(\x08\x12)\n\x0cvector_clock\x18\x02 \x01(\x0b\x32\x13.common.VectorClock\"\x07\n\x05\x45mptyb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -35,6 +35,8 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_VECTORCLOCK']._serialized_end=53
   _globals['_REQUEST']._serialized_start=55
   _globals['_REQUEST']._serialized_end=125
-  _globals['_EMPTY']._serialized_start=127
-  _globals['_EMPTY']._serialized_end=134
+  _globals['_RESPONSE']._serialized_start=127
+  _globals['_RESPONSE']._serialized_end=194
+  _globals['_EMPTY']._serialized_start=196
+  _globals['_EMPTY']._serialized_end=203
 # @@protoc_insertion_point(module_scope)
