@@ -2,36 +2,11 @@ syntax = "proto3";
 
 package fraud;
 
+import "common.proto";
+
 service FraudService {
-    rpc SayFraud (FraudRequest) returns (OrderResponse);
-    rpc InitVerification (InitRequest) returns (Empty);
-}
-
-message VectorClock {
-    repeated uint32 clocks = 1;
-}
-
-message InitRequest {
-    string order_id = 1;
-    OrderRequest order_request = 2;
-}
-
-message FraudRequest {
-    string order_id = 1;
-    VectorClock vector_clock = 2;
-}
-
-message Empty {
-
-}
-
-message Item {
-    string name = 1;
-    int32 quantity = 2;
-}
-
-message OrderRequest {
-    repeated Item items = 1;
+    rpc SayFraud (common.Request) returns (OrderResponse);
+    rpc InitVerification (common.ItemsInitRequest) returns (common.Empty);
 }
 
 message OrderResponse {

@@ -9,18 +9,9 @@ service VerificationService {
     rpc initVerification (InitRequest) returns (common.Empty);
 }
 
-message VectorClock {
-    repeated uint32 clocks = 1;
-}
-
 message InitRequest {
     string order_id = 1;
     TransactionRequest transaction_request = 2;
-}
-
-message VerificationRequest {
-    string order_id = 1;
-    VectorClock vector_clock = 2;
 }
 
 message TransactionRequest {

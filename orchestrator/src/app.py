@@ -64,8 +64,8 @@ def initFraudVerification(order_id, request_data):
         # Create a stub object.
         stub = fraud_detection_grpc.FraudServiceStub(channel)
         # Call the service through the stub object.
-        request = fraud_detection.OrderRequest(items=request_data.get('items', []))
-        request = fraud_detection.InitRequest(order_id=order_id, order_request=request)
+        request = common.Items(items=request_data.get('items', []))
+        request = common.ItemsInitRequest(order_id=order_id, items=request)
         response = stub.InitVerification(request)
     return response
 
@@ -84,8 +84,8 @@ def init_suggestion(order_id, request_data):
         # Create a stub object.
         stub = suggestions_grpc.SuggestionServiceStub(channel)
         # Call the service through the stub object.
-        request = suggestions.OrderRequest(items=request_data.get('items', []))
-        request = suggestions.InitRequest(order_id=order_id, order_request=request)
+        request = common.Items(items=request_data.get('items', []))
+        request = common.ItemsInitRequest(order_id=order_id, items=request)
         response = stub.initSuggestion(request)
     return response
 

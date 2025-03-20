@@ -16,4 +16,18 @@ message Response {
     VectorClock vector_clock = 2;
 }
 
+message Item {
+    string name = 1;
+    int32 quantity = 2;
+}
+
+message Items {
+    repeated Item items = 1;    
+}
+
+message ItemsInitRequest {
+    string order_id = 1;
+    common.Items items = 2;
+}
+
 message Empty {}

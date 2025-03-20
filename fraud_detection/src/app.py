@@ -20,9 +20,9 @@ class FraudService(fraud_detection_grpc.FraudServiceServicer):
         self.total_svcs=total_svcs
         self.orders={}#orderId -> {data}
 
-    def InitVerification(self,request: fraud_detection.InitRequest, context=None):
+    def InitVerification(self,request: common.ItemsInitRequest, context=None):
         order_id=request.order_id
-        data=request.order_request
+        data=request.items
         self.orders[order_id]={"data":data,"vc":[0]*self.total_svcs}
         return common.Empty()
 

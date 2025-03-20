@@ -3,6 +3,7 @@
 import grpc
 import warnings
 
+import common_pb2 as common__pb2
 import fraud_detection_pb2 as fraud__detection__pb2
 
 GRPC_GENERATED_VERSION = '1.70.0'
@@ -36,13 +37,13 @@ class FraudServiceStub(object):
         """
         self.SayFraud = channel.unary_unary(
                 '/fraud.FraudService/SayFraud',
-                request_serializer=fraud__detection__pb2.FraudRequest.SerializeToString,
+                request_serializer=common__pb2.Request.SerializeToString,
                 response_deserializer=fraud__detection__pb2.OrderResponse.FromString,
                 _registered_method=True)
         self.InitVerification = channel.unary_unary(
                 '/fraud.FraudService/InitVerification',
-                request_serializer=fraud__detection__pb2.InitRequest.SerializeToString,
-                response_deserializer=fraud__detection__pb2.Empty.FromString,
+                request_serializer=common__pb2.ItemsInitRequest.SerializeToString,
+                response_deserializer=common__pb2.Empty.FromString,
                 _registered_method=True)
 
 
@@ -66,13 +67,13 @@ def add_FraudServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'SayFraud': grpc.unary_unary_rpc_method_handler(
                     servicer.SayFraud,
-                    request_deserializer=fraud__detection__pb2.FraudRequest.FromString,
+                    request_deserializer=common__pb2.Request.FromString,
                     response_serializer=fraud__detection__pb2.OrderResponse.SerializeToString,
             ),
             'InitVerification': grpc.unary_unary_rpc_method_handler(
                     servicer.InitVerification,
-                    request_deserializer=fraud__detection__pb2.InitRequest.FromString,
-                    response_serializer=fraud__detection__pb2.Empty.SerializeToString,
+                    request_deserializer=common__pb2.ItemsInitRequest.FromString,
+                    response_serializer=common__pb2.Empty.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -100,7 +101,7 @@ class FraudService(object):
             request,
             target,
             '/fraud.FraudService/SayFraud',
-            fraud__detection__pb2.FraudRequest.SerializeToString,
+            common__pb2.Request.SerializeToString,
             fraud__detection__pb2.OrderResponse.FromString,
             options,
             channel_credentials,
@@ -127,8 +128,8 @@ class FraudService(object):
             request,
             target,
             '/fraud.FraudService/InitVerification',
-            fraud__detection__pb2.InitRequest.SerializeToString,
-            fraud__detection__pb2.Empty.FromString,
+            common__pb2.ItemsInitRequest.SerializeToString,
+            common__pb2.Empty.FromString,
             options,
             channel_credentials,
             insecure,

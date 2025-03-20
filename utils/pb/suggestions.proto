@@ -6,36 +6,13 @@ import "common.proto";
 
 service SuggestionService {
     rpc SaySuggest (common.Request) returns (Suggestions);
-    rpc initSuggestion (InitRequest) returns (common.Empty);
-}
-
-message VectorClock {
-    repeated uint32 clocks = 1;
-}
-
-message InitRequest {
-    string order_id = 1;
-    OrderRequest order_request = 2;
-}
-
-message SuggestionRequest {
-    string order_id = 1;
-    VectorClock vector_clock = 2;
+    rpc initSuggestion (common.ItemsInitRequest) returns (common.Empty);
 }
 
 message Book {
     string bookId = 1;
     string title = 2;
     string author = 3;
-}
-
-message Item {
-    string name = 1;
-    int32 quantity = 2;
-}
-
-message OrderRequest {
-    repeated Item items = 1;
 }
 
 message Suggestions {

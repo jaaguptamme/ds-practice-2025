@@ -109,7 +109,7 @@ class VerificationService(transaction_verification_grpc.VerificationServiceServi
         print("VerificationService - Response: " + response.message)
         # Return the response object
         return response'''
-
+    
 def serve():
     # Create a gRPC server
     server = grpc.server(futures.ThreadPoolExecutor())

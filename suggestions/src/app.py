@@ -26,7 +26,7 @@ from difflib import SequenceMatcher
 def similar(a, b):
     return SequenceMatcher(None, a, b).ratio()
 
-def findMostSimilarBooks(order: suggestions.OrderRequest):
+def findMostSimilarBooks(order: common.ItemsInitRequest):
     similarBooks = []
     for item in order.items:
         mostSimilar=existingBooks[0]
@@ -47,7 +47,7 @@ class SuggestionsService(suggestions_grpc.SuggestionServiceServicer):
         self.orders={}#orderId -> {data}
     def initSuggestion(self,request, context=None):
         order_id=request.order_id
-        data=request.order_request
+        data=request.items
         print("HEEEEEEEEEEEEEEEEEEERE2")
         self.orders[order_id]={"data":data,"vc":[0]*self.total_svcs}
         return common.Empty()

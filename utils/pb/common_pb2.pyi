@@ -27,6 +27,28 @@ class Response(_message.Message):
     vector_clock: VectorClock
     def __init__(self, fail: bool = ..., vector_clock: _Optional[_Union[VectorClock, _Mapping]] = ...) -> None: ...
 
+class Item(_message.Message):
+    __slots__ = ("name", "quantity")
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    QUANTITY_FIELD_NUMBER: _ClassVar[int]
+    name: str
+    quantity: int
+    def __init__(self, name: _Optional[str] = ..., quantity: _Optional[int] = ...) -> None: ...
+
+class Items(_message.Message):
+    __slots__ = ("items",)
+    ITEMS_FIELD_NUMBER: _ClassVar[int]
+    items: _containers.RepeatedCompositeFieldContainer[Item]
+    def __init__(self, items: _Optional[_Iterable[_Union[Item, _Mapping]]] = ...) -> None: ...
+
+class ItemsInitRequest(_message.Message):
+    __slots__ = ("order_id", "items")
+    ORDER_ID_FIELD_NUMBER: _ClassVar[int]
+    ITEMS_FIELD_NUMBER: _ClassVar[int]
+    order_id: str
+    items: Items
+    def __init__(self, order_id: _Optional[str] = ..., items: _Optional[_Union[Items, _Mapping]] = ...) -> None: ...
+
 class Empty(_message.Message):
     __slots__ = ()
     def __init__(self) -> None: ...

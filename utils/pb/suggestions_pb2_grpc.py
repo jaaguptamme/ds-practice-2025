@@ -42,7 +42,7 @@ class SuggestionServiceStub(object):
                 _registered_method=True)
         self.initSuggestion = channel.unary_unary(
                 '/suggestions.SuggestionService/initSuggestion',
-                request_serializer=suggestions__pb2.InitRequest.SerializeToString,
+                request_serializer=common__pb2.ItemsInitRequest.SerializeToString,
                 response_deserializer=common__pb2.Empty.FromString,
                 _registered_method=True)
 
@@ -72,7 +72,7 @@ def add_SuggestionServiceServicer_to_server(servicer, server):
             ),
             'initSuggestion': grpc.unary_unary_rpc_method_handler(
                     servicer.initSuggestion,
-                    request_deserializer=suggestions__pb2.InitRequest.FromString,
+                    request_deserializer=common__pb2.ItemsInitRequest.FromString,
                     response_serializer=common__pb2.Empty.SerializeToString,
             ),
     }
@@ -128,7 +128,7 @@ class SuggestionService(object):
             request,
             target,
             '/suggestions.SuggestionService/initSuggestion',
-            suggestions__pb2.InitRequest.SerializeToString,
+            common__pb2.ItemsInitRequest.SerializeToString,
             common__pb2.Empty.FromString,
             options,
             channel_credentials,
