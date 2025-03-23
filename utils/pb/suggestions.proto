@@ -17,4 +17,5 @@ message Book {
 
 message Suggestions {
     repeated Book books = 1;
+    common.VectorClock vector_clock = 2;
 }

@@ -1,7 +1,8 @@
 import common_pb2 as _common_pb2
+from google.protobuf.internal import containers as _containers
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
-from typing import ClassVar as _ClassVar, Mapping as _Mapping, Optional as _Optional, Union as _Union
+from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Mapping, Optional as _Optional, Union as _Union
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
@@ -14,7 +15,7 @@ class InitRequest(_message.Message):
     def __init__(self, order_id: _Optional[str] = ..., transaction_request: _Optional[_Union[TransactionRequest, _Mapping]] = ...) -> None: ...
 
 class TransactionRequest(_message.Message):
-    __slots__ = ("name", "contact", "credit_card_number", "expiration_date", "cvv", "billing_address", "quantity")
+    __slots__ = ("name", "contact", "credit_card_number", "expiration_date", "cvv", "billing_address", "quantity", "items")
     NAME_FIELD_NUMBER: _ClassVar[int]
     CONTACT_FIELD_NUMBER: _ClassVar[int]
     CREDIT_CARD_NUMBER_FIELD_NUMBER: _ClassVar[int]
@@ -22,6 +23,7 @@ class TransactionRequest(_message.Message):
     CVV_FIELD_NUMBER: _ClassVar[int]
     BILLING_ADDRESS_FIELD_NUMBER: _ClassVar[int]
     QUANTITY_FIELD_NUMBER: _ClassVar[int]
+    ITEMS_FIELD_NUMBER: _ClassVar[int]
     name: str
     contact: str
     credit_card_number: str
@@ -29,7 +31,8 @@ class TransactionRequest(_message.Message):
     cvv: int
     billing_address: str
     quantity: int
-    def __init__(self, name: _Optional[str] = ..., contact: _Optional[str] = ..., credit_card_number: _Optional[str] = ..., expiration_date: _Optional[str] = ..., cvv: _Optional[int] = ..., billing_address: _Optional[str] = ..., quantity: _Optional[int] = ...) -> None: ...
+    items: _containers.RepeatedCompositeFieldContainer[_common_pb2.Item]
+    def __init__(self, name: _Optional[str] = ..., contact: _Optional[str] = ..., credit_card_number: _Optional[str] = ..., expiration_date: _Optional[str] = ..., cvv: _Optional[int] = ..., billing_address: _Optional[str] = ..., quantity: _Optional[int] = ..., items: _Optional[_Iterable[_Union[_common_pb2.Item, _Mapping]]] = ...) -> None: ...
 
 class TransactionResponse(_message.Message):
     __slots__ = ("is_verified", "message")

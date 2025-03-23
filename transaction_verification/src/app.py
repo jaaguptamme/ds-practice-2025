@@ -45,20 +45,34 @@ def verify_contact(request: transaction_verification.TransactionRequest):
 # Create a class to define the server functions, derived from
 # transaction_verification_pb2_grpc.VerificationServiceServicer
 class VerificationService(transaction_verification_grpc.VerificationServiceServicer):
-    def __init__(self,svc_idx=0,total_svcs=3):
+    def __init__(self,svc_idx=2,total_svcs=3):
         self.svc_idx=svc_idx
         self.total_svcs=total_svcs
         self.orders={}#orderId -> {data}
-    def initVerification(self,request, context=None):
+    def initVerification(self,request:transaction_verification.InitRequest, context=None):
         order_id=request.order_id
         data=request.transaction_request
         print("HEEEEEEEEEEEEEEEEEEERE")
         self.orders[order_id]={"data":data,"vc":[0]*self.total_svcs}
         return common.Empty()
+    
     def merge_and_incrment(self,local_vc,incoming_vc=0):
         for i in range(self.total_svcs):
             local_vc[i]=max(local_vc[i],incoming_vc[i])
         local_vc[self.svc_idx]+=1
+
+    def BookListNotEmtpy(self, request: common.Request, context) -> common.Response:
+        order_id=request.order_id
+        incoming_vc=request.vector_clock.clocks
+        entry = self.orders.get(order_id)
+        data = entry["data"]
+        self.merge_and_incrment(entry["vc"],incoming_vc)
+        if len(data.items)==0:
+            response = common.Response(fail=True, message="Books list is empty", vector_clock=common.VectorClock(clocks=entry["vc"]))
+        else: 
+            response = common.Response(fail=False, message="", vector_clock=common.VectorClock(clocks=entry["vc"]))
+        return response
+
     def SayVerification(self, request, context):
         order_id=request.order_id
         incoming_vc=request.vector_clock.clocks

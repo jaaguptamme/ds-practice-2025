@@ -26,9 +26,9 @@ from difflib import SequenceMatcher
 def similar(a, b):
     return SequenceMatcher(None, a, b).ratio()
 
-def findMostSimilarBooks(order: common.ItemsInitRequest):
+def findMostSimilarBooks(order):
     similarBooks = []
-    for item in order.items:
+    for item in order:
         mostSimilar=existingBooks[0]
         for book in existingBooks:
             if similar(book.title, item.name) > similar(mostSimilar.title, item.name):
@@ -41,7 +41,7 @@ def findMostSimilarBooks(order: common.ItemsInitRequest):
 # Create a class to define the server functions, derived from
 # suggestions_pb2_grpc.SuggestionServiceServicer
 class SuggestionsService(suggestions_grpc.SuggestionServiceServicer):
-    def __init__(self,svc_idx=0,total_svcs=3):
+    def __init__(self,svc_idx=1,total_svcs=3):
         self.svc_idx=svc_idx
         self.total_svcs=total_svcs
         self.orders={}#orderId -> {data}
@@ -62,7 +62,7 @@ class SuggestionsService(suggestions_grpc.SuggestionServiceServicer):
         print("SuggestionsService - Request received")
         entry = self.orders.get(order_id)
         self.merge_and_incrment(entry["vc"],incoming_vc)
-        response = suggestions.Suggestions()
+        response = suggestions.Suggestions(vector_clock=common.VectorClock(clocks=entry["vc"]))
         response.books.extend(findMostSimilarBooks(entry["data"]))
         print("SuggestionsService - Response: " + str(response.books))
         return response

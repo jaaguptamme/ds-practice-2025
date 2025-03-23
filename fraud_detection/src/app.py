@@ -27,9 +27,48 @@ class FraudService(fraud_detection_grpc.FraudServiceServicer):
         return common.Empty()
 
     def merge_and_incrment(self,local_vc,incoming_vc=0):
+        print(f"local_vc: {local_vc}")
+        print(f"incoming_vc: {incoming_vc}")
         for i in range(self.total_svcs):
             local_vc[i]=max(local_vc[i],incoming_vc[i])
         local_vc[self.svc_idx]+=1
+
+    #TODO ACTUALLY IMPLEMENT THIS
+    def CheckUserData(self, request: common.Request, context):
+        order_id=request.order_id
+        incoming_vc=request.vector_clock.clocks
+        entry = self.orders.get(order_id)
+        data = entry["data"]
+        self.merge_and_incrment(entry["vc"],incoming_vc)
+
+        fail = False
+        message = ""
+        totalAmount=sum([item.quantity for item in data])
+        if(len(data)>=10):
+            fail = True
+            message = "Ordered too many items"
+        elif(totalAmount>=10):
+            fail = True
+            message = "Ordered too many of the same item"
+        else:
+            #TODO CHECK USER DATA
+            ...
+        response = common.Response(message=message, fail=fail, vector_clock=common.VectorClock(clocks=entry["vc"]))
+        return response
+
+    #TODO ACTUALLY IMPLEMENT THIS
+    def CheckCreditCard(self, request: common.Request, context):
+        order_id=request.order_id
+        incoming_vc=request.vector_clock.clocks
+        entry = self.orders.get(order_id)
+        data = entry["data"]
+        self.merge_and_incrment(entry["vc"],incoming_vc)
+        print("KINNIII VectorClock=",entry["vc"])
+        if (entry["vc"][2] < 3 or entry["vc"][0] < 3):
+            response = common.Response(message="Early stop", fail=False, vector_clock=common.VectorClock(clocks=entry["vc"]))
+            return response
+        response = common.Response(message="User data is OK", fail=False, vector_clock=common.VectorClock(clocks=entry["vc"]))
+        return response
 
     def SayFraud(self, request: common.Request, context):
         print(f"FraudService - Request recieved - {request.vector_clock.clocks}")
@@ -41,8 +80,8 @@ class FraudService(fraud_detection_grpc.FraudServiceServicer):
         self.merge_and_incrment(entry["vc"],incoming_vc)
 
         response = fraud_detection.OrderResponse()
-        totalAmount=sum([item.quantity for item in data.items])
-        if(len(data.items)>=10):
+        totalAmount=sum([item.quantity for item in data])
+        if(len(data)>=10):
             response.is_fraud = True
             response.message = "Ordered too many items"
         elif(totalAmount>=10):

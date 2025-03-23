@@ -13,7 +13,8 @@ message Request {
 
 message Response {
     bool fail = 1;
-    VectorClock vector_clock = 2;
+    string message = 2;
+    VectorClock vector_clock = 3;
 }
 
 message Item {
@@ -21,13 +22,9 @@ message Item {
     int32 quantity = 2;
 }
 
-message Items {
-    repeated Item items = 1;    
-}
-
 message ItemsInitRequest {
     string order_id = 1;
-    common.Items items = 2;
+    repeated Item items = 2;
 }
 
 message Empty {}

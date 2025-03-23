@@ -45,6 +45,11 @@ class VerificationServiceStub(object):
                 request_serializer=transaction__verification__pb2.InitRequest.SerializeToString,
                 response_deserializer=common__pb2.Empty.FromString,
                 _registered_method=True)
+        self.BookListNotEmtpy = channel.unary_unary(
+                '/verification.VerificationService/BookListNotEmtpy',
+                request_serializer=common__pb2.Request.SerializeToString,
+                response_deserializer=common__pb2.Response.FromString,
+                _registered_method=True)
 
 
 class VerificationServiceServicer(object):
@@ -62,6 +67,12 @@ class VerificationServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def BookListNotEmtpy(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_VerificationServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -74,6 +85,11 @@ def add_VerificationServiceServicer_to_server(servicer, server):
                     servicer.initVerification,
                     request_deserializer=transaction__verification__pb2.InitRequest.FromString,
                     response_serializer=common__pb2.Empty.SerializeToString,
+            ),
+            'BookListNotEmtpy': grpc.unary_unary_rpc_method_handler(
+                    servicer.BookListNotEmtpy,
+                    request_deserializer=common__pb2.Request.FromString,
+                    response_serializer=common__pb2.Response.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -130,6 +146,33 @@ class VerificationService(object):
             '/verification.VerificationService/initVerification',
             transaction__verification__pb2.InitRequest.SerializeToString,
             common__pb2.Empty.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def BookListNotEmtpy(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/verification.VerificationService/BookListNotEmtpy',
+            common__pb2.Request.SerializeToString,
+            common__pb2.Response.FromString,
             options,
             channel_credentials,
             insecure,

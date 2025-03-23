@@ -7,6 +7,8 @@ import "common.proto";
 service FraudService {
     rpc SayFraud (common.Request) returns (OrderResponse);
     rpc InitVerification (common.ItemsInitRequest) returns (common.Empty);
+    rpc CheckUserData (common.Request) returns (common.Response);
+    rpc CheckCreditCard (common.Request) returns (common.Response);
 }
 
 message OrderResponse {

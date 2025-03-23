@@ -45,6 +45,16 @@ class FraudServiceStub(object):
                 request_serializer=common__pb2.ItemsInitRequest.SerializeToString,
                 response_deserializer=common__pb2.Empty.FromString,
                 _registered_method=True)
+        self.CheckUserData = channel.unary_unary(
+                '/fraud.FraudService/CheckUserData',
+                request_serializer=common__pb2.Request.SerializeToString,
+                response_deserializer=common__pb2.Response.FromString,
+                _registered_method=True)
+        self.CheckCreditCard = channel.unary_unary(
+                '/fraud.FraudService/CheckCreditCard',
+                request_serializer=common__pb2.Request.SerializeToString,
+                response_deserializer=common__pb2.Response.FromString,
+                _registered_method=True)
 
 
 class FraudServiceServicer(object):
@@ -62,6 +72,18 @@ class FraudServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def CheckUserData(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def CheckCreditCard(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_FraudServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -74,6 +96,16 @@ def add_FraudServiceServicer_to_server(servicer, server):
                     servicer.InitVerification,
                     request_deserializer=common__pb2.ItemsInitRequest.FromString,
                     response_serializer=common__pb2.Empty.SerializeToString,
+            ),
+            'CheckUserData': grpc.unary_unary_rpc_method_handler(
+                    servicer.CheckUserData,
+                    request_deserializer=common__pb2.Request.FromString,
+                    response_serializer=common__pb2.Response.SerializeToString,
+            ),
+            'CheckCreditCard': grpc.unary_unary_rpc_method_handler(
+                    servicer.CheckCreditCard,
+                    request_deserializer=common__pb2.Request.FromString,
+                    response_serializer=common__pb2.Response.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -130,6 +162,60 @@ class FraudService(object):
             '/fraud.FraudService/InitVerification',
             common__pb2.ItemsInitRequest.SerializeToString,
             common__pb2.Empty.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def CheckUserData(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/fraud.FraudService/CheckUserData',
+            common__pb2.Request.SerializeToString,
+            common__pb2.Response.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def CheckCreditCard(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/fraud.FraudService/CheckCreditCard',
+            common__pb2.Request.SerializeToString,
+            common__pb2.Response.FromString,
             options,
             channel_credentials,
             insecure,

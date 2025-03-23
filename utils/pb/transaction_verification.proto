@@ -7,6 +7,7 @@ import "common.proto";
 service VerificationService {
     rpc SayVerification (common.Request) returns (TransactionResponse);
     rpc initVerification (InitRequest) returns (common.Empty);
+    rpc BookListNotEmtpy (common.Request) returns (common.Response);
 }
 
 message InitRequest {
@@ -22,6 +23,7 @@ message TransactionRequest {
     int32 cvv = 5;
     string billing_address = 6;
     int32 quantity = 7;
+    repeated common.Item items = 8;
 }
 
 message TransactionResponse {
