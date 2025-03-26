@@ -112,7 +112,7 @@ def event_a(order_id, transaction_stub: transaction_verification_grpc.Verificati
             suggestions_stub: suggestions_grpc.SuggestionServiceStub):
     resp = transaction_stub.BookListNotEmtpy(common.Request(order_id=order_id, vector_clock=common.VectorClock(clocks=vectorClocks[order_id])))
     if resp.fail:
-        raise FailException(resp.message)
+        raise Exception(resp.message)
     comibine_vector_clock(order_id, resp.vector_clock)
     event_c(order_id, transaction_stub, fraud_detection_stub, suggestions_stub)
 
@@ -124,7 +124,7 @@ def event_b(order_id,
     resp = transaction_stub.BookListNotEmtpy(common.Request(order_id=order_id, 
                                                             vector_clock=common.VectorClock(clocks=vectorClocks[order_id])))
     if resp.fail:
-        raise FailException(resp.message)#TODO
+        raise Exception(resp.message)#TODO
     comibine_vector_clock(order_id, resp.vector_clock)
     event_d(order_id, fraud_detection_stub,suggestions_stub)
 
@@ -134,7 +134,7 @@ def event_c(order_id,transaction_stub: transaction_verification_grpc.Verificatio
     #TODO transaction-verification service verifies if all mandatory user data (name, contact, address…) is filled in.
     resp = transaction_stub.BookListNotEmtpy(common.Request(order_id=order_id, vector_clock=common.VectorClock(clocks=vectorClocks[order_id])))
     if resp.fail:
-        raise FailException(resp.message)#TODO
+        raise Exception(resp.message)#TODO
     comibine_vector_clock(order_id, resp.vector_clock)
     event_e(order_id, fraud_detection_stub, suggestions_stub)
 
@@ -145,7 +145,7 @@ def event_d(order_id, fraud_detection_stub: fraud_detection_grpc.FraudServiceStu
     print("VECTOR CLOCK D:",vectorClocks[order_id])
     resp = fraud_detection_stub.CheckUserData(common.Request(order_id=order_id,vector_clock=common.VectorClock(clocks=vectorClocks[order_id])))
     if resp.fail:
-        raise FailException(resp.message)#TODO
+        raise Exception(resp.message)#TODO
     comibine_vector_clock(order_id, resp.vector_clock)
     event_e(order_id, fraud_detection_stub, suggestions_stub)
 
@@ -159,7 +159,7 @@ def event_e(order_id,
     print("REPSONSE", resp)
     print(resp.fail)
     if resp.fail:
-        raise FailException(resp.message)
+        raise Exception(resp.message)
     print(resp.message)
     if resp.message == "Early stop":
         print("KINNI")
@@ -178,9 +178,6 @@ def event_f(order_id,
     raise BookException(resp.books)
 
 class BookException(Exception):
-    pass
-
-class FailException(Exception):
     pass
 
 def FraudVerificationSuggestions(request_data):
@@ -207,18 +204,18 @@ def FraudVerificationSuggestions(request_data):
                 transaction_verification_stub.initVerification(general_request)
                 suggestions_stub.initSuggestion(suggestions_request)
                 
-                suggested_books = None
-                fail_error = None
+                suggested_books = []
+                exception_occured = None
 
                 def thread_wrapper(target, args):
                     try:
                         target(*args)
-                    except BookException as e:
-                        nonlocal suggested_books
+                    except Exception as e:
+                        nonlocal suggested_books, exception_occured
+                        if exception_occured:
+                            return                        
                         suggested_books = e.args[0]
-                    except FailException as e:
-                        nonlocal fail_error
-                        fail_error = e
+                        exception_occured = e
                 t_a = threading.Thread(target=thread_wrapper, args=(event_a, (order_id, transaction_verification_stub, fraud_detection_stub, suggestions_stub)))    
                 t_b = threading.Thread(target=thread_wrapper, args=(event_b, (order_id, transaction_verification_stub, fraud_detection_stub, suggestions_stub)))
                 t_a.start()
@@ -226,20 +223,18 @@ def FraudVerificationSuggestions(request_data):
                 t_a.join()
                 t_b.join()
                 print(suggested_books)
-                if fail_error is not None:
+                if isinstance(suggested_books, str):
                     return {
                         'orderId': order_id,
-                        'status': f'Order Rejected: {fail_error}',
+                        'status': f'Order Rejected: {suggested_books}',
                         'suggestedBooks': []
                     }
-                elif suggested_books is not None:
+                elif exception_occured:
                     return {
                         'orderId': order_id,
                         'status': 'Order Approved',
-                        'suggestedBooks': [MessageToDict(book) for book in suggested_books], # type: ignore
+                        'suggestedBooks': [MessageToDict(book) for book in suggested_books],
                     }
-                else:
-                    raise AssertionError("Unexpected error occurred, threads did not terminate in an expected way")
 
                 #t_a = threading.Thread(target=event_a, args=(order_id, transaction_verification_stub, fraud_detection_stub, suggestions_stub))
                 #t_b = threading.Thread(target=event_b, args=(order_id, transaction_verification_stub, fraud_detection_stub, suggestions_stub))

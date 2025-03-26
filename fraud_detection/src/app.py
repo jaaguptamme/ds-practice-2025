@@ -11,7 +11,7 @@ import common_pb2 as common
 import fraud_detection_pb2 as fraud_detection
 import fraud_detection_pb2_grpc as fraud_detection_grpc
 import re
-import datetime
+from datetime import datetime
 
 import grpc
 from concurrent import futures
@@ -41,8 +41,6 @@ class FraudService(fraud_detection_grpc.FraudServiceServicer):
         incoming_vc=request.vector_clock.clocks
         entry = self.orders.get(order_id)
         data = entry["data"]
-        print("AIHDOOAIGHOIEGHEOIHGEOIEGH", entry)
-        print("idshogianlanvlkaIhfoiahaoigheoigeauepaiufpajfpanf", data)
         self.merge_and_incrment(entry["vc"],incoming_vc)
         fail = False
         message = ""
@@ -54,12 +52,11 @@ class FraudService(fraud_detection_grpc.FraudServiceServicer):
         elif(totalAmount>=10):
             fail = True
             message = "Ordered too many of the same item"
-        #else:
-        #    print("CONTAKT", data.contact)
-        #    valid  = re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', data.contact)
-        #    if valid == False:
-        #        fail = True
-        #        message = "Contact should be valid"
+        else:
+            valid  = re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', data.contact)
+            if valid == False:
+                fail = True
+                message = "Contact should be valid"
             
         response = common.Response(message=message, fail=fail, vector_clock=common.VectorClock(clocks=entry["vc"]))
         return response
@@ -74,28 +71,24 @@ class FraudService(fraud_detection_grpc.FraudServiceServicer):
         if (entry["vc"][2] < 3 or entry["vc"][0] < 3):
             response = common.Response(message="Early stop", fail=False, vector_clock=common.VectorClock(clocks=entry["vc"]))
             return response
-        #print(data)
         fail=False
         message = "User data is OK"
-        #if len(str(request.cvv))!=3:
-        #    message = "CVV is wrong"
-        #    fail = True
-        #if len(str(request.credit_card_number))!=16:
-        #    message = "Credit card number is wrong"
-        #    fail = True
-
-        #print("KREDIIT KAART")
-        #month=int(request.expiration_date.split('/')[0])
-        #year=int(request.expiration_date.split('/')[1])
-        #current_month = datetime.now().month
-        #current_year = (datetime.now().year)%100
-        #if current_year>year:
-        #    message = "Credit card has expired"
-        #    fail = True
-        #print("AJAKONTROLLLL")
-        #if current_year==year and current_month>month:
-        #    message = "Credit card has expired"
-        #    fail = True
+        if len(str(data.cvv))!=3:
+            message = "CVV is wrong"
+            fail = True
+        if len(str(data.credit_card_number))!=16:
+            message = "Credit card number is wrong"
+            fail = True
+        month=int(data.expiration_date.split('/')[0])
+        year=int(data.expiration_date.split('/')[1])
+        current_month = datetime.now().month
+        current_year = (datetime.now().year)%100
+        if current_year>year:
+            message = "Credit card has expired"
+            fail = True
+        if current_year==year and current_month>month:
+            message = "Credit card has expired"
+            fail = True
         response = common.Response(message=message, fail=fail, vector_clock=common.VectorClock(clocks=entry["vc"]))
         return response
 
