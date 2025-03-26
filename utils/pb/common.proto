@@ -22,6 +22,22 @@ message Item {
     int32 quantity = 2;
 }
 
+message InitAllInfoRequest{
+    string order_id = 1;
+    AllInfoRequest request = 2;
+}
+
+message AllInfoRequest {
+    string name = 1; 
+    string contact = 2;
+    string credit_card_number = 3;
+    string expiration_date = 4;
+    int32 cvv = 5;
+    string billing_address = 6;
+    int32 quantity = 7;
+    repeated common.Item items = 8;
+}
+
 message ItemsInitRequest {
     string order_id = 1;
     repeated Item items = 2;

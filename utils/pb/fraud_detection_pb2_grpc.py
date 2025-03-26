@@ -42,7 +42,7 @@ class FraudServiceStub(object):
                 _registered_method=True)
         self.InitVerification = channel.unary_unary(
                 '/fraud.FraudService/InitVerification',
-                request_serializer=common__pb2.ItemsInitRequest.SerializeToString,
+                request_serializer=common__pb2.InitAllInfoRequest.SerializeToString,
                 response_deserializer=common__pb2.Empty.FromString,
                 _registered_method=True)
         self.CheckUserData = channel.unary_unary(
@@ -94,7 +94,7 @@ def add_FraudServiceServicer_to_server(servicer, server):
             ),
             'InitVerification': grpc.unary_unary_rpc_method_handler(
                     servicer.InitVerification,
-                    request_deserializer=common__pb2.ItemsInitRequest.FromString,
+                    request_deserializer=common__pb2.InitAllInfoRequest.FromString,
                     response_serializer=common__pb2.Empty.SerializeToString,
             ),
             'CheckUserData': grpc.unary_unary_rpc_method_handler(
@@ -160,7 +160,7 @@ class FraudService(object):
             request,
             target,
             '/fraud.FraudService/InitVerification',
-            common__pb2.ItemsInitRequest.SerializeToString,
+            common__pb2.InitAllInfoRequest.SerializeToString,
             common__pb2.Empty.FromString,
             options,
             channel_credentials,

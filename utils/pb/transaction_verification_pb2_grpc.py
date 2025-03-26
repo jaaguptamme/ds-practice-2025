@@ -42,7 +42,7 @@ class VerificationServiceStub(object):
                 _registered_method=True)
         self.initVerification = channel.unary_unary(
                 '/verification.VerificationService/initVerification',
-                request_serializer=transaction__verification__pb2.InitRequest.SerializeToString,
+                request_serializer=common__pb2.InitAllInfoRequest.SerializeToString,
                 response_deserializer=common__pb2.Empty.FromString,
                 _registered_method=True)
         self.BookListNotEmtpy = channel.unary_unary(
@@ -83,7 +83,7 @@ def add_VerificationServiceServicer_to_server(servicer, server):
             ),
             'initVerification': grpc.unary_unary_rpc_method_handler(
                     servicer.initVerification,
-                    request_deserializer=transaction__verification__pb2.InitRequest.FromString,
+                    request_deserializer=common__pb2.InitAllInfoRequest.FromString,
                     response_serializer=common__pb2.Empty.SerializeToString,
             ),
             'BookListNotEmtpy': grpc.unary_unary_rpc_method_handler(
@@ -144,7 +144,7 @@ class VerificationService(object):
             request,
             target,
             '/verification.VerificationService/initVerification',
-            transaction__verification__pb2.InitRequest.SerializeToString,
+            common__pb2.InitAllInfoRequest.SerializeToString,
             common__pb2.Empty.FromString,
             options,
             channel_credentials,

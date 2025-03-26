@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0c\x63ommon.proto\x12\x06\x63ommon\"\x1d\n\x0bVectorClock\x12\x0e\n\x06\x63locks\x18\x01 \x03(\r\"F\n\x07Request\x12\x10\n\x08order_id\x18\x01 \x01(\t\x12)\n\x0cvector_clock\x18\x02 \x01(\x0b\x32\x13.common.VectorClock\"T\n\x08Response\x12\x0c\n\x04\x66\x61il\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\x12)\n\x0cvector_clock\x18\x03 \x01(\x0b\x32\x13.common.VectorClock\"&\n\x04Item\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x10\n\x08quantity\x18\x02 \x01(\x05\"A\n\x10ItemsInitRequest\x12\x10\n\x08order_id\x18\x01 \x01(\t\x12\x1b\n\x05items\x18\x02 \x03(\x0b\x32\x0c.common.Item\"\x07\n\x05\x45mptyb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0c\x63ommon.proto\x12\x06\x63ommon\"\x1d\n\x0bVectorClock\x12\x0e\n\x06\x63locks\x18\x01 \x03(\r\"F\n\x07Request\x12\x10\n\x08order_id\x18\x01 \x01(\t\x12)\n\x0cvector_clock\x18\x02 \x01(\x0b\x32\x13.common.VectorClock\"T\n\x08Response\x12\x0c\n\x04\x66\x61il\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\x12)\n\x0cvector_clock\x18\x03 \x01(\x0b\x32\x13.common.VectorClock\"&\n\x04Item\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x10\n\x08quantity\x18\x02 \x01(\x05\"O\n\x12InitAllInfoRequest\x12\x10\n\x08order_id\x18\x01 \x01(\t\x12\'\n\x07request\x18\x02 \x01(\x0b\x32\x16.common.AllInfoRequest\"\xb9\x01\n\x0e\x41llInfoRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0f\n\x07\x63ontact\x18\x02 \x01(\t\x12\x1a\n\x12\x63redit_card_number\x18\x03 \x01(\t\x12\x17\n\x0f\x65xpiration_date\x18\x04 \x01(\t\x12\x0b\n\x03\x63vv\x18\x05 \x01(\x05\x12\x17\n\x0f\x62illing_address\x18\x06 \x01(\t\x12\x10\n\x08quantity\x18\x07 \x01(\x05\x12\x1b\n\x05items\x18\x08 \x03(\x0b\x32\x0c.common.Item\"A\n\x10ItemsInitRequest\x12\x10\n\x08order_id\x18\x01 \x01(\t\x12\x1b\n\x05items\x18\x02 \x03(\x0b\x32\x0c.common.Item\"\x07\n\x05\x45mptyb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -39,8 +39,12 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_RESPONSE']._serialized_end=211
   _globals['_ITEM']._serialized_start=213
   _globals['_ITEM']._serialized_end=251
-  _globals['_ITEMSINITREQUEST']._serialized_start=253
-  _globals['_ITEMSINITREQUEST']._serialized_end=318
-  _globals['_EMPTY']._serialized_start=320
-  _globals['_EMPTY']._serialized_end=327
+  _globals['_INITALLINFOREQUEST']._serialized_start=253
+  _globals['_INITALLINFOREQUEST']._serialized_end=332
+  _globals['_ALLINFOREQUEST']._serialized_start=335
+  _globals['_ALLINFOREQUEST']._serialized_end=520
+  _globals['_ITEMSINITREQUEST']._serialized_start=522
+  _globals['_ITEMSINITREQUEST']._serialized_end=587
+  _globals['_EMPTY']._serialized_start=589
+  _globals['_EMPTY']._serialized_end=596
 # @@protoc_insertion_point(module_scope)

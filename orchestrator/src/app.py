@@ -156,6 +156,8 @@ def event_e(order_id,
     print("event_e")
     print("VECTOR CLOCK E:",vectorClocks[order_id])
     resp = fraud_detection_stub.CheckCreditCard(common.Request(order_id=order_id, vector_clock=common.VectorClock(clocks=vectorClocks[order_id])))
+    print("REPSONSE", resp)
+    print(resp.fail)
     if resp.fail:
         raise Exception(resp.message)
     print(resp.message)
@@ -187,9 +189,8 @@ def FraudVerificationSuggestions(request_data):
                 fraud_detection_stub = fraud_detection_grpc.FraudServiceStub(fraud_detection_channel)
                 transaction_verification_stub = transaction_verification_grpc.VerificationServiceStub(transcation_verifiction_channel)
                 suggestions_stub = suggestions_grpc.SuggestionServiceStub(suggestions_channel)
-                fraud_detection_request = common.ItemsInitRequest(order_id=order_id, items=request_data.get('items', []))
                 billing_address = request_data['billingAddress']
-                transaction_verification_request = transaction_verification.InitRequest(order_id=order_id, transaction_request=transaction_verification.TransactionRequest(
+                general_request  = common.InitAllInfoRequest(order_id=order_id, request=common.AllInfoRequest(
                     name=request_data['user']['name'],
                     contact=request_data['user']['contact'],
                     credit_card_number=request_data['creditCard']['number'],
@@ -197,11 +198,10 @@ def FraudVerificationSuggestions(request_data):
                     cvv=int(request_data['creditCard']['cvv']),
                     billing_address = f"{billing_address['street']}, {billing_address['zip']} {billing_address['city']}, {billing_address['state']} {billing_address['country']}",
                     quantity=sum(item['quantity'] for item in request_data['items']),
-                    items=request_data.get('items', [])
-                ))
+                    items=request_data.get('items', [])))
                 suggestions_request = common.ItemsInitRequest(order_id=order_id, items=request_data.get('items', []))
-                fraud_detection_stub.InitVerification(fraud_detection_request)
-                transaction_verification_stub.initVerification(transaction_verification_request)
+                fraud_detection_stub.InitVerification(general_request)
+                transaction_verification_stub.initVerification(general_request)
                 suggestions_stub.initSuggestion(suggestions_request)
                 
                 suggested_books = []
@@ -214,6 +214,7 @@ def FraudVerificationSuggestions(request_data):
                         nonlocal suggested_books, exception_occured
                         if exception_occured:
                             return
+                        
                         suggested_books = e.args[0]
                         exception_occured = e
                 t_a = threading.Thread(target=thread_wrapper, args=(event_a, (order_id, transaction_verification_stub, fraud_detection_stub, suggestions_stub)))    

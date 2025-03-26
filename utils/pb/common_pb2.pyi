@@ -37,6 +37,34 @@ class Item(_message.Message):
     quantity: int
     def __init__(self, name: _Optional[str] = ..., quantity: _Optional[int] = ...) -> None: ...
 
+class InitAllInfoRequest(_message.Message):
+    __slots__ = ("order_id", "request")
+    ORDER_ID_FIELD_NUMBER: _ClassVar[int]
+    REQUEST_FIELD_NUMBER: _ClassVar[int]
+    order_id: str
+    request: AllInfoRequest
+    def __init__(self, order_id: _Optional[str] = ..., request: _Optional[_Union[AllInfoRequest, _Mapping]] = ...) -> None: ...
+
+class AllInfoRequest(_message.Message):
+    __slots__ = ("name", "contact", "credit_card_number", "expiration_date", "cvv", "billing_address", "quantity", "items")
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    CONTACT_FIELD_NUMBER: _ClassVar[int]
+    CREDIT_CARD_NUMBER_FIELD_NUMBER: _ClassVar[int]
+    EXPIRATION_DATE_FIELD_NUMBER: _ClassVar[int]
+    CVV_FIELD_NUMBER: _ClassVar[int]
+    BILLING_ADDRESS_FIELD_NUMBER: _ClassVar[int]
+    QUANTITY_FIELD_NUMBER: _ClassVar[int]
+    ITEMS_FIELD_NUMBER: _ClassVar[int]
+    name: str
+    contact: str
+    credit_card_number: str
+    expiration_date: str
+    cvv: int
+    billing_address: str
+    quantity: int
+    items: _containers.RepeatedCompositeFieldContainer[Item]
+    def __init__(self, name: _Optional[str] = ..., contact: _Optional[str] = ..., credit_card_number: _Optional[str] = ..., expiration_date: _Optional[str] = ..., cvv: _Optional[int] = ..., billing_address: _Optional[str] = ..., quantity: _Optional[int] = ..., items: _Optional[_Iterable[_Union[Item, _Mapping]]] = ...) -> None: ...
+
 class ItemsInitRequest(_message.Message):
     __slots__ = ("order_id", "items")
     ORDER_ID_FIELD_NUMBER: _ClassVar[int]

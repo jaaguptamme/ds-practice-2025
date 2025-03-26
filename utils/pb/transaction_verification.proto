@@ -6,25 +6,15 @@ import "common.proto";
 
 service VerificationService {
     rpc SayVerification (common.Request) returns (TransactionResponse);
-    rpc initVerification (InitRequest) returns (common.Empty);
+    rpc initVerification (common.InitAllInfoRequest) returns (common.Empty);
     rpc BookListNotEmtpy (common.Request) returns (common.Response);
 }
 
 message InitRequest {
     string order_id = 1;
-    TransactionRequest transaction_request = 2;
+    common.AllInfoRequest transaction_request = 2;
 }
 
-message TransactionRequest {
-    string name = 1; 
-    string contact = 2;
-    string credit_card_number = 3;
-    string expiration_date = 4;
-    int32 cvv = 5;
-    string billing_address = 6;
-    int32 quantity = 7;
-    repeated common.Item items = 8;
-}
 
 message TransactionResponse {
     bool is_verified = 1;

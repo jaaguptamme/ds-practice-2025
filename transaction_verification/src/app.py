@@ -16,7 +16,7 @@ from concurrent import futures
 from datetime import datetime
 import re
 
-def verify_credit_card(request: transaction_verification.TransactionRequest):
+def verify_credit_card(request: common.AllInfoRequest):
     if len(str(request.cvv))!=3:
         return False
     if len(str(request.credit_card_number))!=16:
@@ -31,14 +31,14 @@ def verify_credit_card(request: transaction_verification.TransactionRequest):
         return False
     return True
 
-def verify_billing_address(request: transaction_verification.TransactionRequest):
+def verify_billing_address(request: common.AllInfoRequest):
     bad_countries  = ['Russia', 'North Korea', 'Spain', 'Greenland']
     for country in bad_countries:
         if country in request.billing_address:
             return False
     return True
 
-def verify_contact(request: transaction_verification.TransactionRequest):
+def verify_contact(request: common.AllInfoRequest):
     valid  = re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', request.contact)
     return valid
 
@@ -49,9 +49,9 @@ class VerificationService(transaction_verification_grpc.VerificationServiceServi
         self.svc_idx=svc_idx
         self.total_svcs=total_svcs
         self.orders={}#orderId -> {data}
-    def initVerification(self,request:transaction_verification.InitRequest, context=None):
+    def initVerification(self,request:common.InitAllInfoRequest, context=None):
         order_id=request.order_id
-        data=request.transaction_request
+        data=request.request
         print("HEEEEEEEEEEEEEEEEEEERE")
         self.orders[order_id]={"data":data,"vc":[0]*self.total_svcs}
         return common.Empty()
