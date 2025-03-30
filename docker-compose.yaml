@@ -123,3 +123,25 @@ services:
       - ./utils:/app/utils
       # Mount the fraud_detection/src directory in the current directory to the /app/fraud_detection/src directory in the container
       - ./order_queue/src:/app/order_queue/src
+  order_executor:
+    build:
+      context: ./
+      dockerfile: ./order_executor/Dockerfile
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock  # Gives access to the Docker API
+      - ./utils:/app/utils
+      - ./order_executor/src:/app/order_executor/src
+    command: ["python", "/app/order_executor/src/app.py", "3"]  # Pass total replicas as an argument
+    deploy:
+      replicas: 3  # Run 3 replicas
+    environment:
+      - PYTHONUNBUFFERED=TRUE
+      - SERVICE_NAME=order_executor
+      - NODENAME='{{.Node.Hostname}}'
+    networks:
+      - order_network
+    
+
+networks:
+  order_network:
+    driver: bridge
