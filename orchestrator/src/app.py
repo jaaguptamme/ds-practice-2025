@@ -15,6 +15,8 @@ import transaction_verification_pb2 as transaction_verification
 import transaction_verification_pb2_grpc as transaction_verification_grpc
 import suggestions_pb2 as suggestions
 import suggestions_pb2_grpc as suggestions_grpc
+import order_queue_pb2 as order_queue
+import order_queue_pb2_grpc as order_queue_grpc
 
 import grpc
 from google.protobuf.json_format import MessageToDict
@@ -112,7 +114,7 @@ def event_a(order_id, transaction_stub: transaction_verification_grpc.Verificati
             suggestions_stub: suggestions_grpc.SuggestionServiceStub):
     resp = transaction_stub.BookListNotEmtpy(common.Request(order_id=order_id, vector_clock=common.VectorClock(clocks=vectorClocks[order_id])))
     if resp.fail:
-        raise Exception(resp.message)
+        raise FailException(resp.message)
     comibine_vector_clock(order_id, resp.vector_clock)
     event_c(order_id, transaction_stub, fraud_detection_stub, suggestions_stub)
 
@@ -124,7 +126,7 @@ def event_b(order_id,
     resp = transaction_stub.BookListNotEmtpy(common.Request(order_id=order_id, 
                                                             vector_clock=common.VectorClock(clocks=vectorClocks[order_id])))
     if resp.fail:
-        raise Exception(resp.message)#TODO
+        raise FailException(resp.message)#TODO
     comibine_vector_clock(order_id, resp.vector_clock)
     event_d(order_id, fraud_detection_stub,suggestions_stub)
 
@@ -134,7 +136,7 @@ def event_c(order_id,transaction_stub: transaction_verification_grpc.Verificatio
     #TODO transaction-verification service verifies if all mandatory user data (name, contact, address…) is filled in.
     resp = transaction_stub.BookListNotEmtpy(common.Request(order_id=order_id, vector_clock=common.VectorClock(clocks=vectorClocks[order_id])))
     if resp.fail:
-        raise Exception(resp.message)#TODO
+        raise FailException(resp.message)#TODO
     comibine_vector_clock(order_id, resp.vector_clock)
     event_e(order_id, fraud_detection_stub, suggestions_stub)
 
@@ -145,7 +147,7 @@ def event_d(order_id, fraud_detection_stub: fraud_detection_grpc.FraudServiceStu
     print("VECTOR CLOCK D:",vectorClocks[order_id])
     resp = fraud_detection_stub.CheckUserData(common.Request(order_id=order_id,vector_clock=common.VectorClock(clocks=vectorClocks[order_id])))
     if resp.fail:
-        raise Exception(resp.message)#TODO
+        raise FailException(resp.message)#TODO
     comibine_vector_clock(order_id, resp.vector_clock)
     event_e(order_id, fraud_detection_stub, suggestions_stub)
 
@@ -159,7 +161,7 @@ def event_e(order_id,
     print("REPSONSE", resp)
     print(resp.fail)
     if resp.fail:
-        raise Exception(resp.message)
+        raise FailException(resp.message)
     print(resp.message)
     if resp.message == "Early stop":
         print("KINNI")
@@ -178,6 +180,8 @@ def event_f(order_id,
     raise BookException(resp.books)
 
 class BookException(Exception):
+    pass
+class FailException(Exception):
     pass
 
 def FraudVerificationSuggestions(request_data):
@@ -204,18 +208,19 @@ def FraudVerificationSuggestions(request_data):
                 transaction_verification_stub.initVerification(general_request)
                 suggestions_stub.initSuggestion(suggestions_request)
                 
-                suggested_books = []
-                exception_occured = None
+                suggested_books = None
+                fail_error = None
 
                 def thread_wrapper(target, args):
                     try:
                         target(*args)
-                    except Exception as e:
-                        nonlocal suggested_books, exception_occured
-                        if exception_occured:
-                            return                        
+                    except BookException as e:
+                        nonlocal suggested_books                  
                         suggested_books = e.args[0]
-                        exception_occured = e
+                    except FailException as e:
+                        nonlocal fail_error
+                        fail_error = e
+                        
                 t_a = threading.Thread(target=thread_wrapper, args=(event_a, (order_id, transaction_verification_stub, fraud_detection_stub, suggestions_stub)))    
                 t_b = threading.Thread(target=thread_wrapper, args=(event_b, (order_id, transaction_verification_stub, fraud_detection_stub, suggestions_stub)))
                 t_a.start()
@@ -223,78 +228,33 @@ def FraudVerificationSuggestions(request_data):
                 t_a.join()
                 t_b.join()
                 print(suggested_books)
-                if isinstance(suggested_books, str):
+                if fail_error is not None:
                     return {
                         'orderId': order_id,
-                        'status': f'Order Rejected: {suggested_books}',
+                        'status': f'Order Rejected: {fail_error}',
                         'suggestedBooks': []
                     }
-                elif exception_occured:
+                elif suggested_books is not None:
+                     #ALL CORRECT
+                    print("SIIN")
+                    with grpc.insecure_channel('order_queue:50051') as order_queue_channel:
+                        order_queue_stub=order_queue_grpc.OrderQueueServiceStub(order_queue_channel)
+                        items_to_send = common.ItemsInitRequest(order_id=order_id, items=request_data.get('items', []))
+                        order_enqueue_response=order_queue_stub.Enqueue(items_to_send)
+                        print("ORDER ENQUEUE RETURNED:",order_enqueue_response.message)
                     return {
                         'orderId': order_id,
                         'status': 'Order Approved',
-                        'suggestedBooks': [MessageToDict(book) for book in suggested_books],
+                        'suggestedBooks': [MessageToDict(book) for book in suggested_books], # type: ignore
                     }
+                else:
+                    raise AssertionError("Unexpected error occurred, threads did not terminate in an expected way")
 
-                #t_a = threading.Thread(target=event_a, args=(order_id, transaction_verification_stub, fraud_detection_stub, suggestions_stub))
-                #t_b = threading.Thread(target=event_b, args=(order_id, transaction_verification_stub, fraud_detection_stub, suggestions_stub))
-                #t_a.start()
-                #t_b.start()
-                #print()
-                #t_a.join()
-                #t_b.join()
-    '''except BookException as e:
-        print("BookException",e)
-        return {
-            'orderId': order_id,
-            'status': 'Order Approved',
-            'suggestedBooks': [MessageToDict(book) for book in e.args[0]],
-        }
-    except Exception as e:
-        print("Exception",e)'''
     return {
             'orderId': order_id,
             'status': f'Order Rejected',
             'suggestedBooks': [],
         }
-                
-    '''with concurrent.futures.ThreadPoolExecutor() as executor:
-        initTransactionFuture = executor.submit(initTransaction, order_id, request_data)
-        initSuggestionFuture = executor.submit(init_suggestion, order_id, request_data)
-        initFraudVerificationFuture = executor.submit(initFraudVerification, order_id, request_data)
-        initTransactionFuture = initTransactionFuture.result()
-        initSuggestionFuture = initSuggestionFuture.result()
-        initFraudVerificationFuture = initFraudVerificationFuture.result() 
-
-    print("WORKS THROUGH INITIALIZATION")  
-
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        fraud_future = executor.submit(check_fraud, order_id)
-        verification_future = executor.submit(get_verification, order_id)
-        suggestion_future = executor.submit(get_suggestion, order_id)
-        fraud_result = fraud_future.result()
-        verification_result = verification_future.result()
-        suggestions_result = suggestion_future.result()
-    
-    if fraud_result.is_fraud:
-        return {
-            'orderId': order_id,
-            'status': f'Order Rejected: {fraud_result.message}',
-            'suggestedBooks': [],
-        }
-
-    if not verification_result.is_verified:
-        return {
-            'orderId': order_id,
-            'status': f'Order Rejected: {verification_result.message}',
-            'suggestedBooks': [],
-        }
-    
-    return {
-        'orderId': order_id,
-        'status': 'Order Approved',
-        'suggestedBooks': [MessageToDict(book) for book in suggestions_result.books],
-    }'''
 
 @app.route('/checkout', methods=['POST'])
 def checkout():

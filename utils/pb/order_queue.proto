@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package queue;
+
+import "common.proto";
+
+service OrderQueueService {
+    rpc Enqueue (common.ItemsInitRequest) returns (EnqueueResponse);
+    rpc Deque (common.Empty) returns (common.ItemsInitRequest);
+}
+
+message EnqueueResponse {
+    bool failed = 1;
+    string message = 2;
+}
