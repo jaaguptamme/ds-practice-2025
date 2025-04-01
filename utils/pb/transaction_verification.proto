@@ -5,7 +5,7 @@ package verification;
 import "common.proto";
 
 service VerificationService {
-    rpc SayVerification (common.Request) returns (TransactionResponse);
+    rpc SayVerification (common.Request) returns (common.Response);
     rpc initVerification (common.InitAllInfoRequest) returns (common.Empty);
     rpc BookListNotEmtpy (common.Request) returns (common.Response);
 }
@@ -13,10 +13,4 @@ service VerificationService {
 message InitRequest {
     string order_id = 1;
     common.AllInfoRequest transaction_request = 2;
-}
-
-
-message TransactionResponse {
-    bool is_verified = 1;
-    string message = 2;
 }

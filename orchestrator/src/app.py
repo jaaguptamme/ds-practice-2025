@@ -32,7 +32,7 @@ def check_fraud(order_id) -> fraud_detection.OrderResponse:
         response = stub.SayFraud(request)
     return response
 
-def get_verification(order_id) -> transaction_verification.TransactionResponse:
+def get_verification(order_id) -> common.Response:
     with grpc.insecure_channel('transaction_verification:50051') as channel:
         # Create a stub object.
         stub = transaction_verification_grpc.VerificationServiceStub(channel)
@@ -122,11 +122,10 @@ def event_b(order_id,
             transaction_stub: transaction_verification_grpc.VerificationServiceStub, 
             fraud_detection_stub: fraud_detection_grpc.FraudServiceStub,
             suggestions_stub: suggestions_grpc.SuggestionServiceStub):
-    #TODO transaction-verification service verifies if all mandatory user data (name, contact, address…) is filled in.
-    resp = transaction_stub.BookListNotEmtpy(common.Request(order_id=order_id, 
+    resp = transaction_stub.SayVerification(common.Request(order_id=order_id, 
                                                             vector_clock=common.VectorClock(clocks=vectorClocks[order_id])))
     if resp.fail:
-        raise FailException(resp.message)#TODO
+        raise FailException(resp.message)
     comibine_vector_clock(order_id, resp.vector_clock)
     event_d(order_id, fraud_detection_stub,suggestions_stub)
 
@@ -134,7 +133,9 @@ def event_c(order_id,transaction_stub: transaction_verification_grpc.Verificatio
             fraud_detection_stub: fraud_detection_grpc.FraudServiceStub,
             suggestions_stub: suggestions_grpc.SuggestionServiceStub):
     #TODO transaction-verification service verifies if all mandatory user data (name, contact, address…) is filled in.
-    resp = transaction_stub.BookListNotEmtpy(common.Request(order_id=order_id, vector_clock=common.VectorClock(clocks=vectorClocks[order_id])))
+    #TODO You seriously want this Jaagup?
+    resp = transaction_stub.SayVerification(common.Request(order_id=order_id, 
+                                                            vector_clock=common.VectorClock(clocks=vectorClocks[order_id])))    
     if resp.fail:
         raise FailException(resp.message)#TODO
     comibine_vector_clock(order_id, resp.vector_clock)

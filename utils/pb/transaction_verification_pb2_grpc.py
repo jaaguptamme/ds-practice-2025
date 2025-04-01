@@ -4,7 +4,6 @@ import grpc
 import warnings
 
 import common_pb2 as common__pb2
-import transaction_verification_pb2 as transaction__verification__pb2
 
 GRPC_GENERATED_VERSION = '1.70.0'
 GRPC_VERSION = grpc.__version__
@@ -38,7 +37,7 @@ class VerificationServiceStub(object):
         self.SayVerification = channel.unary_unary(
                 '/verification.VerificationService/SayVerification',
                 request_serializer=common__pb2.Request.SerializeToString,
-                response_deserializer=transaction__verification__pb2.TransactionResponse.FromString,
+                response_deserializer=common__pb2.Response.FromString,
                 _registered_method=True)
         self.initVerification = channel.unary_unary(
                 '/verification.VerificationService/initVerification',
@@ -79,7 +78,7 @@ def add_VerificationServiceServicer_to_server(servicer, server):
             'SayVerification': grpc.unary_unary_rpc_method_handler(
                     servicer.SayVerification,
                     request_deserializer=common__pb2.Request.FromString,
-                    response_serializer=transaction__verification__pb2.TransactionResponse.SerializeToString,
+                    response_serializer=common__pb2.Response.SerializeToString,
             ),
             'initVerification': grpc.unary_unary_rpc_method_handler(
                     servicer.initVerification,
@@ -118,7 +117,7 @@ class VerificationService(object):
             target,
             '/verification.VerificationService/SayVerification',
             common__pb2.Request.SerializeToString,
-            transaction__verification__pb2.TransactionResponse.FromString,
+            common__pb2.Response.FromString,
             options,
             channel_credentials,
             insecure,

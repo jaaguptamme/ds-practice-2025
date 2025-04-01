@@ -12,11 +12,3 @@ class InitRequest(_message.Message):
     order_id: str
     transaction_request: _common_pb2.AllInfoRequest
     def __init__(self, order_id: _Optional[str] = ..., transaction_request: _Optional[_Union[_common_pb2.AllInfoRequest, _Mapping]] = ...) -> None: ...
-
-class TransactionResponse(_message.Message):
-    __slots__ = ("is_verified", "message")
-    IS_VERIFIED_FIELD_NUMBER: _ClassVar[int]
-    MESSAGE_FIELD_NUMBER: _ClassVar[int]
-    is_verified: bool
-    message: str
-    def __init__(self, is_verified: bool = ..., message: _Optional[str] = ...) -> None: ...

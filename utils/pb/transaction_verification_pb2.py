@@ -25,7 +25,7 @@ _sym_db = _symbol_database.Default()
 import common_pb2 as common__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1etransaction_verification.proto\x12\x0cverification\x1a\x0c\x63ommon.proto\"T\n\x0bInitRequest\x12\x10\n\x08order_id\x18\x01 \x01(\t\x12\x33\n\x13transaction_request\x18\x02 \x01(\x0b\x32\x16.common.AllInfoRequest\";\n\x13TransactionResponse\x12\x13\n\x0bis_verified\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t2\xd2\x01\n\x13VerificationService\x12\x45\n\x0fSayVerification\x12\x0f.common.Request\x1a!.verification.TransactionResponse\x12=\n\x10initVerification\x12\x1a.common.InitAllInfoRequest\x1a\r.common.Empty\x12\x35\n\x10\x42ookListNotEmtpy\x12\x0f.common.Request\x1a\x10.common.Responseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1etransaction_verification.proto\x12\x0cverification\x1a\x0c\x63ommon.proto\"T\n\x0bInitRequest\x12\x10\n\x08order_id\x18\x01 \x01(\t\x12\x33\n\x13transaction_request\x18\x02 \x01(\x0b\x32\x16.common.AllInfoRequest2\xc1\x01\n\x13VerificationService\x12\x34\n\x0fSayVerification\x12\x0f.common.Request\x1a\x10.common.Response\x12=\n\x10initVerification\x12\x1a.common.InitAllInfoRequest\x1a\r.common.Empty\x12\x35\n\x10\x42ookListNotEmtpy\x12\x0f.common.Request\x1a\x10.common.Responseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -34,8 +34,6 @@ if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
   _globals['_INITREQUEST']._serialized_start=62
   _globals['_INITREQUEST']._serialized_end=146
-  _globals['_TRANSACTIONRESPONSE']._serialized_start=148
-  _globals['_TRANSACTIONRESPONSE']._serialized_end=207
-  _globals['_VERIFICATIONSERVICE']._serialized_start=210
-  _globals['_VERIFICATIONSERVICE']._serialized_end=420
+  _globals['_VERIFICATIONSERVICE']._serialized_start=149
+  _globals['_VERIFICATIONSERVICE']._serialized_end=342
 # @@protoc_insertion_point(module_scope)

@@ -79,24 +79,22 @@ class VerificationService(transaction_verification_grpc.VerificationServiceServi
         entry = self.orders.get(order_id)
         data = entry["data"]
         self.merge_and_incrment(entry["vc"],incoming_vc)
-        response = transaction_verification.TransactionResponse()
         # Set the greeting field of the response object
         is_correct=True
-        response.message = "Hello, you are get verification"
+        message = "Hello, you are get verification"
 
         if verify_contact(data)==False:
-            response.message = "Given contact should be valid email"
+            message = "Given contact should be valid email"
             is_correct=False
 
         if verify_credit_card(data)==False:
-            response.message = "Given credit card is not valid"
+            message = "Given credit card is not valid"
             is_correct=False
         
         if verify_billing_address(data)==False:
-            response.message = "We don't take orders from that country"
+            message = "We don't take orders from that country"
             is_correct=False
-
-        response.is_verified=is_correct
+        response = common.Response(fail= (is_correct==False), message= message, vector_clock=common.VectorClock(clocks=entry["vc"]))
         return response
     '''# Create an RPC function to say hello
     def SayVerification(self, request, context):
