@@ -112,41 +112,47 @@ def comibine_vector_clock(order_id, new_clock):
 def event_a(order_id, transaction_stub: transaction_verification_grpc.VerificationServiceStub,
             fraud_detection_stub: fraud_detection_grpc.FraudServiceStub,
             suggestions_stub: suggestions_grpc.SuggestionServiceStub):
+    print("EVENT A START: ",vectorClocks[order_id])
     resp = transaction_stub.BookListNotEmtpy(common.Request(order_id=order_id, vector_clock=common.VectorClock(clocks=vectorClocks[order_id])))
     if resp.fail:
         raise FailException(resp.message)
     comibine_vector_clock(order_id, resp.vector_clock)
+    print("VECTOR CLOCK A:",vectorClocks[order_id])
     event_c(order_id, transaction_stub, fraud_detection_stub, suggestions_stub)
 
 def event_b(order_id, 
             transaction_stub: transaction_verification_grpc.VerificationServiceStub, 
             fraud_detection_stub: fraud_detection_grpc.FraudServiceStub,
             suggestions_stub: suggestions_grpc.SuggestionServiceStub):
+    print("EVENT B START: ",vectorClocks[order_id])
     resp = transaction_stub.UserDataVerification(common.Request(order_id=order_id, 
                                                             vector_clock=common.VectorClock(clocks=vectorClocks[order_id])))
     if resp.fail:
         raise FailException(resp.message)
     comibine_vector_clock(order_id, resp.vector_clock)
+    print("VECTOR CLOCK B:",vectorClocks[order_id])
     event_d(order_id, fraud_detection_stub,suggestions_stub)
 
 def event_c(order_id,transaction_stub: transaction_verification_grpc.VerificationServiceStub,
             fraud_detection_stub: fraud_detection_grpc.FraudServiceStub,
             suggestions_stub: suggestions_grpc.SuggestionServiceStub):
+    print("EVENT C START: ",vectorClocks[order_id])
     resp = transaction_stub.CreditCardVerification(common.Request(order_id=order_id, 
                                                             vector_clock=common.VectorClock(clocks=vectorClocks[order_id])))    
     if resp.fail:
         raise FailException(resp.message)#TODO
     comibine_vector_clock(order_id, resp.vector_clock)
+    print("VECTOR CLOCK C:",vectorClocks[order_id])
     event_e(order_id, fraud_detection_stub, suggestions_stub)
 
 def event_d(order_id, fraud_detection_stub: fraud_detection_grpc.FraudServiceStub,
             suggestions_stub: suggestions_grpc.SuggestionServiceStub):
     #TODO fraud-detection service checks the user data for fraud.
-    print("event_d")
-    print("VECTOR CLOCK D:",vectorClocks[order_id])
+    print("EVENT D START: ", vectorClocks[order_id])
     resp = fraud_detection_stub.CheckUserData(common.Request(order_id=order_id,vector_clock=common.VectorClock(clocks=vectorClocks[order_id])))
     if resp.fail:
         raise FailException(resp.message)#TODO
+    print("VECTOR CLOCK D:",vectorClocks[order_id])
     comibine_vector_clock(order_id, resp.vector_clock)
     event_e(order_id, fraud_detection_stub, suggestions_stub)
 
@@ -154,28 +160,23 @@ def event_e(order_id,
             fraud_detection_stub: fraud_detection_grpc.FraudServiceStub,
             suggestions_stub: suggestions_grpc.SuggestionServiceStub):
     #fraud-detection service checks the credit card data for fraud.
-    print("event_e")
-    print("VECTOR CLOCK E:",vectorClocks[order_id])
+    print("EVENT E START: ", vectorClocks[order_id])
     resp = fraud_detection_stub.CheckCreditCard(common.Request(order_id=order_id, vector_clock=common.VectorClock(clocks=vectorClocks[order_id])))
-    print("REPSONSE", resp)
-    print(resp.fail)
     if resp.fail:
         raise FailException(resp.message)
-    print(resp.message)
     if resp.message == "Early stop":
-        print("KINNI")
         return
+    print("VECTOR CLOCK E:",vectorClocks[order_id])
     comibine_vector_clock(order_id, resp.vector_clock)
     event_f(order_id, suggestions_stub)
 
 def event_f(order_id,
             suggestions_stub: suggestions_grpc.SuggestionServiceStub):
-    #TODO  suggestions service generates book suggestions.
+    print("EVENT F START: ", vectorClocks[order_id])
     resp = suggestions_stub.SaySuggest(common.Request(order_id=order_id, vector_clock=common.VectorClock(clocks=vectorClocks[order_id])))
     comibine_vector_clock(order_id, resp.vector_clock)
-    print("event_f")
     print("VECTOR CLOCK F:",vectorClocks[order_id])
-    print(resp.books)
+    print("F: suggested books: ",resp.books)
     raise BookException(resp.books)
 
 class BookException(Exception):
@@ -189,6 +190,7 @@ def FraudVerificationSuggestions(request_data):
     with grpc.insecure_channel('fraud_detection:50051') as fraud_detection_channel:
         with grpc.insecure_channel('transaction_verification:50051') as transcation_verifiction_channel:
             with grpc.insecure_channel('suggestions:50051') as suggestions_channel:
+                #Initing everything
                 fraud_detection_stub = fraud_detection_grpc.FraudServiceStub(fraud_detection_channel)
                 transaction_verification_stub = transaction_verification_grpc.VerificationServiceStub(transcation_verifiction_channel)
                 suggestions_stub = suggestions_grpc.SuggestionServiceStub(suggestions_channel)
@@ -210,13 +212,14 @@ def FraudVerificationSuggestions(request_data):
                 suggested_books = None
                 fail_error = None
 
+                #Wrapper around threads, that catches returned message
                 def thread_wrapper(target, args):
                     try:
                         target(*args)
-                    except BookException as e:
+                    except BookException as e:#Suggestions
                         nonlocal suggested_books                  
                         suggested_books = e.args[0]
-                    except FailException as e:
+                    except FailException as e:#Some kind of an error message
                         nonlocal fail_error
                         fail_error = e
                         
@@ -226,7 +229,6 @@ def FraudVerificationSuggestions(request_data):
                 t_b.start()
                 t_a.join()
                 t_b.join()
-                print(suggested_books)
                 if fail_error is not None:
                     return {
                         'orderId': order_id,
@@ -234,13 +236,13 @@ def FraudVerificationSuggestions(request_data):
                         'suggestedBooks': []
                     }
                 elif suggested_books is not None:
-                     #ALL CORRECT
-                    print("SIIN")
+                     #ALL CORRECT, SO send to order queu
                     with grpc.insecure_channel('order_queue:50051') as order_queue_channel:
                         order_queue_stub=order_queue_grpc.OrderQueueServiceStub(order_queue_channel)
                         items_to_send = common.ItemsInitRequest(order_id=order_id, items=request_data.get('items', []))
                         order_enqueue_response=order_queue_stub.Enqueue(items_to_send)
                         print("ORDER ENQUEUE RETURNED:",order_enqueue_response.message)
+                    #Finally return books to frontend
                     return {
                         'orderId': order_id,
                         'status': 'Order Approved',

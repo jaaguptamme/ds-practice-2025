@@ -35,3 +35,9 @@ If a backend service (e.g., fraud detection) fails, the orchestrator will handle
 
 Data Consistency Issues:
 Vector clocks are used to maintain consistency across services.
+
+
+
+
+# Vector clocks diagram:
+Separate file

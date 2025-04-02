@@ -49,8 +49,8 @@ class VerificationService(transaction_verification_grpc.VerificationServiceServi
     def initVerification(self,request:common.InitAllInfoRequest, context=None):
         order_id=request.order_id
         data=request.request
-        print("HEEEEEEEEEEEEEEEEEEERE")
         self.orders[order_id]={"data":data,"vc":[0]*self.total_svcs}
+        print("INIT DONE")
         return common.Empty()
     
     def merge_and_incrment(self,local_vc,incoming_vc=0):

@@ -48,8 +48,8 @@ class SuggestionsService(suggestions_grpc.SuggestionServiceServicer):
     def initSuggestion(self,request, context=None):
         order_id=request.order_id
         data=request.items
-        print("HEEEEEEEEEEEEEEEEEEERE2")
         self.orders[order_id]={"data":data,"vc":[0]*self.total_svcs}
+        print("INIT DONE")
         return common.Empty()
     def merge_and_incrment(self,local_vc,incoming_vc=0):
         for i in range(self.total_svcs):

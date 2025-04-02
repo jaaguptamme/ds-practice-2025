@@ -13,7 +13,7 @@ from concurrent import futures
 import grpc
 import order_queue_pb2_grpc as order_queue_grpc
 import docker
-
+import time
 class OrderExecutorService:
     def __init__(self, executor_id, known_ids, queue_stub):
         self.executor_id = executor_id
@@ -27,6 +27,9 @@ class OrderExecutorService:
     def run(self):
         #TODO
         print("RUNNING",self.executor_id)
+        while True:
+            time.sleep(10)
+            print("RUNNING")
         pass
     
 def launch_executor(executor_id, know_ids):
@@ -44,8 +47,9 @@ def get_all_container_list():
 if __name__ == '__main__':
     client = docker.from_env()
     get_all_container_list()
-    """hostname = os.getenv("NODENAME", "order_executor.0")  # Default to "order_executor.0" for testing
-    print("HOSTNAME",hostname)
+    print(os.getenv("HOSTNAME"))  # Default to "order_executor.0" for testing
+    launch_executor("",3)
+    """
     replica_id = int(hostname.split('.')[-1])  # Extract the replica number
     print(sys.argv)
     replica_id = int(sys.argv[2])  # Pass replica ID as an argument
