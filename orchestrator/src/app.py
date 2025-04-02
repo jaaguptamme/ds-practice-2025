@@ -32,15 +32,15 @@ def check_fraud(order_id) -> fraud_detection.OrderResponse:
         response = stub.SayFraud(request)
     return response
 
-def get_verification(order_id) -> common.Response:
-    with grpc.insecure_channel('transaction_verification:50051') as channel:
-        # Create a stub object.
-        stub = transaction_verification_grpc.VerificationServiceStub(channel)
-        # Call the service through the stub object.
-        vector_clock = common.VectorClock(clocks=[0,0,0])
-        request = common.Request(order_id=order_id, vector_clock=vector_clock)
-        response = stub.SayVerification(request)
-    return response
+#def get_verification(order_id) -> common.Response:
+#    with grpc.insecure_channel('transaction_verification:50051') as channel:
+#        # Create a stub object.
+#        stub = transaction_verification_grpc.VerificationServiceStub(channel)
+#        # Call the service through the stub object.
+#        vector_clock = common.VectorClock(clocks=[0,0,0])
+#        request = common.Request(order_id=order_id, vector_clock=vector_clock)
+#        response = stub.SayVerification(request)
+#    return response
 
 def initTransaction(order_id, request_data):
     with grpc.insecure_channel('transaction_verification:50051') as channel:
@@ -48,7 +48,7 @@ def initTransaction(order_id, request_data):
         stub = transaction_verification_grpc.VerificationServiceStub(channel)
         # Call the service through the stub object.
         billing_address = request_data['billingAddress']
-        billing_address = f"{billing_address['street']}, {billing_address['zip']} {billing_address['city']}, {billing_address['state']} {billing_address['country']}"
+        billing_address = f"{billing_address['street']}, {billing_address['zip']}, {billing_address['city']}, {billing_address['state']}, {billing_address['country']}"
         request = transaction_verification.TransactionRequest(
             name=request_data['user']['name'],
             contact=request_data['user']['contact'],
@@ -122,7 +122,7 @@ def event_b(order_id,
             transaction_stub: transaction_verification_grpc.VerificationServiceStub, 
             fraud_detection_stub: fraud_detection_grpc.FraudServiceStub,
             suggestions_stub: suggestions_grpc.SuggestionServiceStub):
-    resp = transaction_stub.SayVerification(common.Request(order_id=order_id, 
+    resp = transaction_stub.UserDataVerification(common.Request(order_id=order_id, 
                                                             vector_clock=common.VectorClock(clocks=vectorClocks[order_id])))
     if resp.fail:
         raise FailException(resp.message)
@@ -132,9 +132,7 @@ def event_b(order_id,
 def event_c(order_id,transaction_stub: transaction_verification_grpc.VerificationServiceStub,
             fraud_detection_stub: fraud_detection_grpc.FraudServiceStub,
             suggestions_stub: suggestions_grpc.SuggestionServiceStub):
-    #TODO transaction-verification service verifies if all mandatory user data (name, contact, address…) is filled in.
-    #TODO You seriously want this Jaagup?
-    resp = transaction_stub.SayVerification(common.Request(order_id=order_id, 
+    resp = transaction_stub.CreditCardVerification(common.Request(order_id=order_id, 
                                                             vector_clock=common.VectorClock(clocks=vectorClocks[order_id])))    
     if resp.fail:
         raise FailException(resp.message)#TODO
@@ -201,7 +199,7 @@ def FraudVerificationSuggestions(request_data):
                     credit_card_number=request_data['creditCard']['number'],
                     expiration_date=request_data['creditCard']['expirationDate'],
                     cvv=int(request_data['creditCard']['cvv']),
-                    billing_address = f"{billing_address['street']}, {billing_address['zip']} {billing_address['city']}, {billing_address['state']} {billing_address['country']}",
+                    billing_address = f"{billing_address['street']}, {billing_address['zip']}, {billing_address['city']}, {billing_address['state']}, {billing_address['country']}",
                     quantity=sum(item['quantity'] for item in request_data['items']),
                     items=request_data.get('items', [])))
                 suggestions_request = common.ItemsInitRequest(order_id=order_id, items=request_data.get('items', []))

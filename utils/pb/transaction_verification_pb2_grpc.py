@@ -34,8 +34,13 @@ class VerificationServiceStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.SayVerification = channel.unary_unary(
-                '/verification.VerificationService/SayVerification',
+        self.CreditCardVerification = channel.unary_unary(
+                '/verification.VerificationService/CreditCardVerification',
+                request_serializer=common__pb2.Request.SerializeToString,
+                response_deserializer=common__pb2.Response.FromString,
+                _registered_method=True)
+        self.UserDataVerification = channel.unary_unary(
+                '/verification.VerificationService/UserDataVerification',
                 request_serializer=common__pb2.Request.SerializeToString,
                 response_deserializer=common__pb2.Response.FromString,
                 _registered_method=True)
@@ -54,7 +59,13 @@ class VerificationServiceStub(object):
 class VerificationServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
-    def SayVerification(self, request, context):
+    def CreditCardVerification(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def UserDataVerification(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -75,8 +86,13 @@ class VerificationServiceServicer(object):
 
 def add_VerificationServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'SayVerification': grpc.unary_unary_rpc_method_handler(
-                    servicer.SayVerification,
+            'CreditCardVerification': grpc.unary_unary_rpc_method_handler(
+                    servicer.CreditCardVerification,
+                    request_deserializer=common__pb2.Request.FromString,
+                    response_serializer=common__pb2.Response.SerializeToString,
+            ),
+            'UserDataVerification': grpc.unary_unary_rpc_method_handler(
+                    servicer.UserDataVerification,
                     request_deserializer=common__pb2.Request.FromString,
                     response_serializer=common__pb2.Response.SerializeToString,
             ),
@@ -102,7 +118,7 @@ class VerificationService(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def SayVerification(request,
+    def CreditCardVerification(request,
             target,
             options=(),
             channel_credentials=None,
@@ -115,7 +131,34 @@ class VerificationService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/verification.VerificationService/SayVerification',
+            '/verification.VerificationService/CreditCardVerification',
+            common__pb2.Request.SerializeToString,
+            common__pb2.Response.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def UserDataVerification(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/verification.VerificationService/UserDataVerification',
             common__pb2.Request.SerializeToString,
             common__pb2.Response.FromString,
             options,

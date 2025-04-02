@@ -13,33 +13,30 @@ import transaction_verification_pb2_grpc as transaction_verification_grpc
 
 import grpc
 from concurrent import futures
-from datetime import datetime
-import re
 
 def verify_credit_card(request: common.AllInfoRequest):
     if len(str(request.cvv))!=3:
         return False
     if len(str(request.credit_card_number))!=16:
         return False
-    month=int(request.expiration_date.split('/')[0])
-    year=int(request.expiration_date.split('/')[1])
-    current_month = datetime.now().month
-    current_year = (datetime.now().year)%100
-    if current_year>year:
-        return False
-    if current_year==year and current_month>month:
-        return False
     return True
 
 def verify_billing_address(request: common.AllInfoRequest):
-    bad_countries  = ['Russia', 'North Korea', 'Spain', 'Greenland']
-    for country in bad_countries:
-        if country in request.billing_address:
-            return False
-    return True
+    correct = True
+    values = request.billing_address.split(',')
+    if len(values)!=5:
+        correct=False
+    for value in values:
+        if len(value.strip())==0:
+            correct=False
+    return correct
 
 def verify_contact(request: common.AllInfoRequest):
-    valid  = re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', request.contact)
+    valid  = request.contact.strip() != ""
+    return valid
+
+def verify_name(request: common.AllInfoRequest):
+    valid = request.name.strip() !=""
     return valid
 
 # Create a class to define the server functions, derived from
@@ -73,7 +70,7 @@ class VerificationService(transaction_verification_grpc.VerificationServiceServi
             response = common.Response(fail=False, message="", vector_clock=common.VectorClock(clocks=entry["vc"]))
         return response
 
-    def SayVerification(self, request, context):
+    def UserDataVerification(self, request, context):
         order_id=request.order_id
         incoming_vc=request.vector_clock.clocks
         entry = self.orders.get(order_id)
@@ -81,19 +78,34 @@ class VerificationService(transaction_verification_grpc.VerificationServiceServi
         self.merge_and_incrment(entry["vc"],incoming_vc)
         # Set the greeting field of the response object
         is_correct=True
-        message = "Hello, you are get verification"
-
+        message = "All needed data is filled in"
         if verify_contact(data)==False:
-            message = "Given contact should be valid email"
+            message = "Email should be filled in"
             is_correct=False
+        if verify_billing_address(data)==False:
+            message = "Billing address should be all filled in"
+            is_correct=False
+        if verify_name(data)==False:
+            message = "Buyer name should be filled in"
+            is_correct=False
+        response = common.Response(fail= (is_correct==False), message= message, vector_clock=common.VectorClock(clocks=entry["vc"]))
+        return response
+
+
+    def CreditCardVerification(self, request, context):
+        order_id=request.order_id
+        incoming_vc=request.vector_clock.clocks
+        entry = self.orders.get(order_id)
+        data = entry["data"]
+        self.merge_and_incrment(entry["vc"],incoming_vc)
+        # Set the greeting field of the response object
+        is_correct=True
+        message = "Credit card information is filled in"
 
         if verify_credit_card(data)==False:
-            message = "Given credit card is not valid"
+            message = "Credit card information is not in correct format"
             is_correct=False
         
-        if verify_billing_address(data)==False:
-            message = "We don't take orders from that country"
-            is_correct=False
         response = common.Response(fail= (is_correct==False), message= message, vector_clock=common.VectorClock(clocks=entry["vc"]))
         return response
     '''# Create an RPC function to say hello

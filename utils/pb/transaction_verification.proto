@@ -5,7 +5,8 @@ package verification;
 import "common.proto";
 
 service VerificationService {
-    rpc SayVerification (common.Request) returns (common.Response);
+    rpc CreditCardVerification (common.Request) returns (common.Response);
+    rpc UserDataVerification (common.Request) returns (common.Response);
     rpc initVerification (common.InitAllInfoRequest) returns (common.Empty);
     rpc BookListNotEmtpy (common.Request) returns (common.Response);
 }
