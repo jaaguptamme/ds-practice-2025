@@ -38,10 +38,10 @@ class OrderQueueServiceStub(object):
         self.Enqueue = channel.unary_unary(
                 '/queue.OrderQueueService/Enqueue',
                 request_serializer=common__pb2.ItemsInitRequest.SerializeToString,
-                response_deserializer=order__queue__pb2.EnqueueResponse.FromString,
+                response_deserializer=common__pb2.Empty.FromString,
                 _registered_method=True)
-        self.Deque = channel.unary_unary(
-                '/queue.OrderQueueService/Deque',
+        self.Dequeue = channel.unary_unary(
+                '/queue.OrderQueueService/Dequeue',
                 request_serializer=common__pb2.Empty.SerializeToString,
                 response_deserializer=common__pb2.ItemsInitRequest.FromString,
                 _registered_method=True)
@@ -56,7 +56,7 @@ class OrderQueueServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def Deque(self, request, context):
+    def Dequeue(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -68,10 +68,10 @@ def add_OrderQueueServiceServicer_to_server(servicer, server):
             'Enqueue': grpc.unary_unary_rpc_method_handler(
                     servicer.Enqueue,
                     request_deserializer=common__pb2.ItemsInitRequest.FromString,
-                    response_serializer=order__queue__pb2.EnqueueResponse.SerializeToString,
+                    response_serializer=common__pb2.Empty.SerializeToString,
             ),
-            'Deque': grpc.unary_unary_rpc_method_handler(
-                    servicer.Deque,
+            'Dequeue': grpc.unary_unary_rpc_method_handler(
+                    servicer.Dequeue,
                     request_deserializer=common__pb2.Empty.FromString,
                     response_serializer=common__pb2.ItemsInitRequest.SerializeToString,
             ),
@@ -102,7 +102,7 @@ class OrderQueueService(object):
             target,
             '/queue.OrderQueueService/Enqueue',
             common__pb2.ItemsInitRequest.SerializeToString,
-            order__queue__pb2.EnqueueResponse.FromString,
+            common__pb2.Empty.FromString,
             options,
             channel_credentials,
             insecure,
@@ -114,7 +114,7 @@ class OrderQueueService(object):
             _registered_method=True)
 
     @staticmethod
-    def Deque(request,
+    def Dequeue(request,
             target,
             options=(),
             channel_credentials=None,
@@ -127,9 +127,124 @@ class OrderQueueService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/queue.OrderQueueService/Deque',
+            '/queue.OrderQueueService/Dequeue',
             common__pb2.Empty.SerializeToString,
             common__pb2.ItemsInitRequest.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+
+class LeaderElectionServiceStub(object):
+    """Missing associated documentation comment in .proto file."""
+
+    def __init__(self, channel):
+        """Constructor.
+
+        Args:
+            channel: A grpc.Channel.
+        """
+        self.DeclareElection = channel.unary_unary(
+                '/queue.LeaderElectionService/DeclareElection',
+                request_serializer=order__queue__pb2.LeaderRequest.SerializeToString,
+                response_deserializer=common__pb2.Empty.FromString,
+                _registered_method=True)
+        self.DeclareVictory = channel.unary_unary(
+                '/queue.LeaderElectionService/DeclareVictory',
+                request_serializer=order__queue__pb2.LeaderRequest.SerializeToString,
+                response_deserializer=common__pb2.Empty.FromString,
+                _registered_method=True)
+
+
+class LeaderElectionServiceServicer(object):
+    """Missing associated documentation comment in .proto file."""
+
+    def DeclareElection(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def DeclareVictory(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+
+def add_LeaderElectionServiceServicer_to_server(servicer, server):
+    rpc_method_handlers = {
+            'DeclareElection': grpc.unary_unary_rpc_method_handler(
+                    servicer.DeclareElection,
+                    request_deserializer=order__queue__pb2.LeaderRequest.FromString,
+                    response_serializer=common__pb2.Empty.SerializeToString,
+            ),
+            'DeclareVictory': grpc.unary_unary_rpc_method_handler(
+                    servicer.DeclareVictory,
+                    request_deserializer=order__queue__pb2.LeaderRequest.FromString,
+                    response_serializer=common__pb2.Empty.SerializeToString,
+            ),
+    }
+    generic_handler = grpc.method_handlers_generic_handler(
+            'queue.LeaderElectionService', rpc_method_handlers)
+    server.add_generic_rpc_handlers((generic_handler,))
+    server.add_registered_method_handlers('queue.LeaderElectionService', rpc_method_handlers)
+
+
+ # This class is part of an EXPERIMENTAL API.
+class LeaderElectionService(object):
+    """Missing associated documentation comment in .proto file."""
+
+    @staticmethod
+    def DeclareElection(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/queue.LeaderElectionService/DeclareElection',
+            order__queue__pb2.LeaderRequest.SerializeToString,
+            common__pb2.Empty.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def DeclareVictory(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/queue.LeaderElectionService/DeclareVictory',
+            order__queue__pb2.LeaderRequest.SerializeToString,
+            common__pb2.Empty.FromString,
             options,
             channel_credentials,
             insecure,

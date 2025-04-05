@@ -25,15 +25,17 @@ _sym_db = _symbol_database.Default()
 import common_pb2 as common__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x11order_queue.proto\x12\x05queue\x1a\x0c\x63ommon.proto\"2\n\x0f\x45nqueueResponse\x12\x0e\n\x06\x66\x61iled\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t2\x82\x01\n\x11OrderQueueService\x12;\n\x07\x45nqueue\x12\x18.common.ItemsInitRequest\x1a\x16.queue.EnqueueResponse\x12\x30\n\x05\x44\x65que\x12\r.common.Empty\x1a\x18.common.ItemsInitRequestb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x11order_queue.proto\x12\x05queue\x1a\x0c\x63ommon.proto\"\"\n\rLeaderRequest\x12\x11\n\tsender_id\x18\x01 \x01(\t2{\n\x11OrderQueueService\x12\x32\n\x07\x45nqueue\x12\x18.common.ItemsInitRequest\x1a\r.common.Empty\x12\x32\n\x07\x44\x65queue\x12\r.common.Empty\x1a\x18.common.ItemsInitRequest2\x86\x01\n\x15LeaderElectionService\x12\x36\n\x0f\x44\x65\x63lareElection\x12\x14.queue.LeaderRequest\x1a\r.common.Empty\x12\x35\n\x0e\x44\x65\x63lareVictory\x12\x14.queue.LeaderRequest\x1a\r.common.Emptyb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'order_queue_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
-  _globals['_ENQUEUERESPONSE']._serialized_start=42
-  _globals['_ENQUEUERESPONSE']._serialized_end=92
-  _globals['_ORDERQUEUESERVICE']._serialized_start=95
-  _globals['_ORDERQUEUESERVICE']._serialized_end=225
+  _globals['_LEADERREQUEST']._serialized_start=42
+  _globals['_LEADERREQUEST']._serialized_end=76
+  _globals['_ORDERQUEUESERVICE']._serialized_start=78
+  _globals['_ORDERQUEUESERVICE']._serialized_end=201
+  _globals['_LEADERELECTIONSERVICE']._serialized_start=204
+  _globals['_LEADERELECTIONSERVICE']._serialized_end=338
 # @@protoc_insertion_point(module_scope)

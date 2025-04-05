@@ -236,13 +236,12 @@ def FraudVerificationSuggestions(request_data):
                         'suggestedBooks': []
                     }
                 elif suggested_books is not None:
-                     #ALL CORRECT, SO send to order queu
+                    # ALL CORRECT, SO send to order queue
                     with grpc.insecure_channel('order_queue:50051') as order_queue_channel:
-                        order_queue_stub=order_queue_grpc.OrderQueueServiceStub(order_queue_channel)
+                        order_queue_stub = order_queue_grpc.OrderQueueServiceStub(order_queue_channel)
                         items_to_send = common.ItemsInitRequest(order_id=order_id, items=request_data.get('items', []))
-                        order_enqueue_response=order_queue_stub.Enqueue(items_to_send)
-                        print("ORDER ENQUEUE RETURNED:",order_enqueue_response.message)
-                    #Finally return books to frontend
+                        order_queue_stub.Enqueue(items_to_send)
+                    # Finally return books to frontend
                     return {
                         'orderId': order_id,
                         'status': 'Order Approved',

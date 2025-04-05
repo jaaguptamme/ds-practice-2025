@@ -5,10 +5,8 @@ from typing import ClassVar as _ClassVar, Optional as _Optional
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
-class EnqueueResponse(_message.Message):
-    __slots__ = ("failed", "message")
-    FAILED_FIELD_NUMBER: _ClassVar[int]
-    MESSAGE_FIELD_NUMBER: _ClassVar[int]
-    failed: bool
-    message: str
-    def __init__(self, failed: bool = ..., message: _Optional[str] = ...) -> None: ...
+class LeaderRequest(_message.Message):
+    __slots__ = ("sender_id",)
+    SENDER_ID_FIELD_NUMBER: _ClassVar[int]
+    sender_id: str
+    def __init__(self, sender_id: _Optional[str] = ...) -> None: ...

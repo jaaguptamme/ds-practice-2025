@@ -131,15 +131,15 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock  # Gives access to the Docker API
       - ./utils:/app/utils
       - ./order_executor/src:/app/order_executor/src
-    command: ["python", "/app/order_executor/src/app.py", "3"]  # Pass total replicas as an argument
     deploy:
       replicas: 3  # Run 3 replicas
+    expose:
+      # Expose port 50051 on the container
+      - 50051
     environment:
+      # Pass the environment variables to the container
+      # The PYTHONUNBUFFERED environment variable ensures that the output from the application is logged to the console
       - PYTHONUNBUFFERED=TRUE
-      - SERVICE_NAME=order_executor
-      - NODENAME='{{.Node.Hostname}}'
-    networks:
-      - order_network
     
 
 networks:

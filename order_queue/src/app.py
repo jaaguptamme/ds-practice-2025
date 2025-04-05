@@ -1,3 +1,4 @@
+import queue
 import sys
 import os
 
@@ -7,11 +8,10 @@ import os
 FILE = __file__ if '__file__' in globals() else os.getenv("PYTHONFILE", "")
 grpc_path = os.path.abspath(os.path.join(FILE, '../../../utils/pb'))
 sys.path.insert(0, grpc_path)
+
 import common_pb2 as common
-import threading
 from concurrent import futures
 import grpc
-import order_queue_pb2 as order_queue
 import order_queue_pb2_grpc as order_queue_grpc
 
 
@@ -19,29 +19,19 @@ import order_queue_pb2_grpc as order_queue_grpc
 # order_queue_pb2_grpc.OrderQueueServiceServicer
 class OrderQueueService(order_queue_grpc.OrderQueueServiceServicer):
     def __init__(self):
-        self._lock = threading.Lock()
-        self._queue = []
+        self._queue = queue.Queue()
     
     def Enqueue(self, request, context):
-        with self._lock:
-            self._queue.append(request)
-        print("ENQUEUE",request)
-        response = order_queue.EnqueueResponse()
-        response.failed = False
-        response.message ="Success"
-        return response
+        print("ENQUEUED:", request)
+        self._queue.put(request)
+        return common.Empty()
     
     def Dequeue(self, request, context):
-        with self._lock:
-            if len(self._queue) == 0:
-                response = common.ItemsInitRequest()
-                response.items = []
-                response.order_id = ""
-                return response
-            else:
-                order = self._queue.pop(0)
-                return order
-    
+        try:
+            return self._queue.get(timeout=2)
+        except queue.Empty:
+            context.abort(grpc.StatusCode.ABORTED, 'Queue empty')
+
 def serve():
     # Create a gRPC server
     server = grpc.server(futures.ThreadPoolExecutor())
