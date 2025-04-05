@@ -1,3 +1,11 @@
+"""
+Fraud Detection Service
+
+Checks for fraudulent user data and credit card information and order quantities. 
+
+Uses vector clocks to maintain consistency across services.
+
+"""
 import sys
 import os
 
@@ -36,7 +44,6 @@ class FraudService(fraud_detection_grpc.FraudServiceServicer):
             local_vc[i]=max(local_vc[i],incoming_vc[i])
         local_vc[self.svc_idx]+=1
 
-    #TODO ACTUALLY IMPLEMENT THIS
     def CheckUserData(self, request: common.Request, context):
         order_id=request.order_id
         incoming_vc=request.vector_clock.clocks
@@ -68,7 +75,7 @@ class FraudService(fraud_detection_grpc.FraudServiceServicer):
         entry = self.orders.get(order_id)
         data = entry["data"]
         self.merge_and_incrment(entry["vc"],incoming_vc)
-        print("KINNIII VectorClock=",entry["vc"])
+        print("VectorClock=",entry["vc"])
         if (entry["vc"][2] < 3 or entry["vc"][0] < 3):
             response = common.Response(message="Early stop", fail=False, vector_clock=common.VectorClock(clocks=entry["vc"]))
             return response

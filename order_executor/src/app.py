@@ -1,3 +1,16 @@
+"""
+Order Executor Service
+
+Responsible for processing orders from the order queue. 
+
+Implements a leader election mechanism to ensure mutual exclusion, which is important as
+this service is replicated several times. 
+Docker API is used to identify all the replicas.
+
+The leader dequeues orders from the queue (in Order Queue Service) and processes them. Other replicas
+periodically check if the leader is up and if not, start a new election.
+
+"""
 import sys
 import os
 

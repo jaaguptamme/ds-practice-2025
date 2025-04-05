@@ -1,3 +1,12 @@
+"""
+Transaction Verification Service
+
+Verifies user data, billing addresses, and credit card details. It ensures that all mandatory fields
+are filled and valid before approving an order. 
+
+Uses vector clocks to maintain consistency across services.
+
+"""
 import sys
 import os
 

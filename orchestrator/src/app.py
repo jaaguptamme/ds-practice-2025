@@ -1,3 +1,13 @@
+"""
+Orchestrator Service
+
+Acts as the central coordinator for the system. It receives requests from the frontend, validates
+the data, and orchestrates calls to other backend services (fraud detection, transaction verification,
+and suggestions). It combines the results and sends a response back to the frontend.
+
+Sends correct orders to Order Queue Service.
+
+"""
 import random
 import sys
 import os
@@ -140,18 +150,17 @@ def event_c(order_id,transaction_stub: transaction_verification_grpc.Verificatio
     resp = transaction_stub.CreditCardVerification(common.Request(order_id=order_id, 
                                                             vector_clock=common.VectorClock(clocks=vectorClocks[order_id])))    
     if resp.fail:
-        raise FailException(resp.message)#TODO
+        raise FailException(resp.message)
     comibine_vector_clock(order_id, resp.vector_clock)
     print("VECTOR CLOCK C:",vectorClocks[order_id])
     event_e(order_id, fraud_detection_stub, suggestions_stub)
 
 def event_d(order_id, fraud_detection_stub: fraud_detection_grpc.FraudServiceStub,
             suggestions_stub: suggestions_grpc.SuggestionServiceStub):
-    #TODO fraud-detection service checks the user data for fraud.
     print("EVENT D START: ", vectorClocks[order_id])
     resp = fraud_detection_stub.CheckUserData(common.Request(order_id=order_id,vector_clock=common.VectorClock(clocks=vectorClocks[order_id])))
     if resp.fail:
-        raise FailException(resp.message)#TODO
+        raise FailException(resp.message)
     print("VECTOR CLOCK D:",vectorClocks[order_id])
     comibine_vector_clock(order_id, resp.vector_clock)
     event_e(order_id, fraud_detection_stub, suggestions_stub)

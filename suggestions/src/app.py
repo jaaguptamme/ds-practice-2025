@@ -1,3 +1,12 @@
+"""
+Suggestions Service
+
+Provides book suggestions based on users' order. It uses a similarity algorithm
+to recommend books that are most relevant to the order.
+
+Uses vector clocks to maintain consistency across services.
+
+"""
 import sys
 import os
 
