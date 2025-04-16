@@ -140,7 +140,25 @@ services:
       # Pass the environment variables to the container
       # The PYTHONUNBUFFERED environment variable ensures that the output from the application is logged to the console
       - PYTHONUNBUFFERED=TRUE
-    
+  books_database:
+    build:
+      # Use the current directory as the build context
+      # This allows us to access the files in the current directory inside the Dockerfile
+      context: ./
+      # Use the Dockerfile in the books executor directorys
+      dockerfile: ./books_database/Dockerfile
+    volumes:
+      - ./utils:/app/utils
+      - ./books_database/src:/app/books_database/src
+    deploy:
+      replicas: 3  # Run 3 replicas
+    expose:
+      # Expose port 50051 on the container
+      - 50051
+    environment:
+      # Pass the environment variables to the container
+      # The PYTHONUNBUFFERED environment variable ensures that the output from the application is logged to the console
+      - PYTHONUNBUFFERED=TRUE
 
 networks:
   order_network:
