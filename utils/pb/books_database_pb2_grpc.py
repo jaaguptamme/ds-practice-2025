@@ -44,6 +44,16 @@ class BooksDatabaseStub(object):
                 request_serializer=books__database__pb2.WriteRequest.SerializeToString,
                 response_deserializer=books__database__pb2.WriteResponse.FromString,
                 _registered_method=True)
+        self.DecrementStock = channel.unary_unary(
+                '/books_db.BooksDatabase/DecrementStock',
+                request_serializer=books__database__pb2.ChangeRequest.SerializeToString,
+                response_deserializer=books__database__pb2.WriteResponse.FromString,
+                _registered_method=True)
+        self.IncrementStock = channel.unary_unary(
+                '/books_db.BooksDatabase/IncrementStock',
+                request_serializer=books__database__pb2.ChangeRequest.SerializeToString,
+                response_deserializer=books__database__pb2.WriteResponse.FromString,
+                _registered_method=True)
 
 
 class BooksDatabaseServicer(object):
@@ -61,6 +71,18 @@ class BooksDatabaseServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def DecrementStock(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def IncrementStock(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_BooksDatabaseServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -72,6 +94,16 @@ def add_BooksDatabaseServicer_to_server(servicer, server):
             'Write': grpc.unary_unary_rpc_method_handler(
                     servicer.Write,
                     request_deserializer=books__database__pb2.WriteRequest.FromString,
+                    response_serializer=books__database__pb2.WriteResponse.SerializeToString,
+            ),
+            'DecrementStock': grpc.unary_unary_rpc_method_handler(
+                    servicer.DecrementStock,
+                    request_deserializer=books__database__pb2.ChangeRequest.FromString,
+                    response_serializer=books__database__pb2.WriteResponse.SerializeToString,
+            ),
+            'IncrementStock': grpc.unary_unary_rpc_method_handler(
+                    servicer.IncrementStock,
+                    request_deserializer=books__database__pb2.ChangeRequest.FromString,
                     response_serializer=books__database__pb2.WriteResponse.SerializeToString,
             ),
     }
@@ -128,6 +160,60 @@ class BooksDatabase(object):
             target,
             '/books_db.BooksDatabase/Write',
             books__database__pb2.WriteRequest.SerializeToString,
+            books__database__pb2.WriteResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def DecrementStock(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/books_db.BooksDatabase/DecrementStock',
+            books__database__pb2.ChangeRequest.SerializeToString,
+            books__database__pb2.WriteResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def IncrementStock(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/books_db.BooksDatabase/IncrementStock',
+            books__database__pb2.ChangeRequest.SerializeToString,
             books__database__pb2.WriteResponse.FromString,
             options,
             channel_credentials,

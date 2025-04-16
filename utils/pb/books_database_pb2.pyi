@@ -30,3 +30,11 @@ class WriteResponse(_message.Message):
     SUCCESS_FIELD_NUMBER: _ClassVar[int]
     success: bool
     def __init__(self, success: bool = ...) -> None: ...
+
+class ChangeRequest(_message.Message):
+    __slots__ = ("title", "amount")
+    TITLE_FIELD_NUMBER: _ClassVar[int]
+    AMOUNT_FIELD_NUMBER: _ClassVar[int]
+    title: str
+    amount: int
+    def __init__(self, title: _Optional[str] = ..., amount: _Optional[int] = ...) -> None: ...

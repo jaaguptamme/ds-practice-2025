@@ -25,7 +25,7 @@ _sym_db = _symbol_database.Default()
 import common_pb2 as common__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x14\x62ooks_database.proto\x12\x08\x62ooks_db\x1a\x0c\x63ommon.proto\"\x1c\n\x0bReadRequest\x12\r\n\x05title\x18\x01 \x01(\t\"\x1d\n\x0cReadResponse\x12\r\n\x05stock\x18\x01 \x01(\x05\"0\n\x0cWriteRequest\x12\r\n\x05title\x18\x01 \x01(\t\x12\x11\n\tnew_stock\x18\x02 \x01(\x05\" \n\rWriteResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x32\x80\x01\n\rBooksDatabase\x12\x35\n\x04Read\x12\x15.books_db.ReadRequest\x1a\x16.books_db.ReadResponse\x12\x38\n\x05Write\x12\x16.books_db.WriteRequest\x1a\x17.books_db.WriteResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x14\x62ooks_database.proto\x12\x08\x62ooks_db\x1a\x0c\x63ommon.proto\"\x1c\n\x0bReadRequest\x12\r\n\x05title\x18\x01 \x01(\t\"\x1d\n\x0cReadResponse\x12\r\n\x05stock\x18\x01 \x01(\x05\"0\n\x0cWriteRequest\x12\r\n\x05title\x18\x01 \x01(\t\x12\x11\n\tnew_stock\x18\x02 \x01(\x05\" \n\rWriteResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\".\n\rChangeRequest\x12\r\n\x05title\x18\x01 \x01(\t\x12\x0e\n\x06\x61mount\x18\x02 \x01(\x05\x32\x88\x02\n\rBooksDatabase\x12\x35\n\x04Read\x12\x15.books_db.ReadRequest\x1a\x16.books_db.ReadResponse\x12\x38\n\x05Write\x12\x16.books_db.WriteRequest\x1a\x17.books_db.WriteResponse\x12\x42\n\x0e\x44\x65\x63rementStock\x12\x17.books_db.ChangeRequest\x1a\x17.books_db.WriteResponse\x12\x42\n\x0eIncrementStock\x12\x17.books_db.ChangeRequest\x1a\x17.books_db.WriteResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -40,6 +40,8 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_WRITEREQUEST']._serialized_end=157
   _globals['_WRITERESPONSE']._serialized_start=159
   _globals['_WRITERESPONSE']._serialized_end=191
-  _globals['_BOOKSDATABASE']._serialized_start=194
-  _globals['_BOOKSDATABASE']._serialized_end=322
+  _globals['_CHANGEREQUEST']._serialized_start=193
+  _globals['_CHANGEREQUEST']._serialized_end=239
+  _globals['_BOOKSDATABASE']._serialized_start=242
+  _globals['_BOOKSDATABASE']._serialized_end=506
 # @@protoc_insertion_point(module_scope)

@@ -28,6 +28,20 @@ class BooksDatabase(books_database_grpc.BooksDatabaseServicer):
         self.store[request.title] = request.new_stock
         return books_database.WriteResponse(success=True)
     
+    def DecrementStock(self, request, context):
+        stock = self.store.get(request.title, 0)
+        if stock<request.amount or request.amount<0:
+            return books_database.WriteResponse(success=False)
+        self.store[request.title] = stock-request.amount
+        return books_database.WriteResponse(success=True)
+    
+    def IncrementStock(self, request, context):
+        stock = self.store.get(request.title, 0)
+        if request.amount < 0:
+            return books_database.WriteResponse(success=False)
+        self.store[request.title] = stock+ request.amount
+        return books_database.WriteResponse(success=True)
+    
 class PrimaryReplica(BooksDatabase):
     def __init__(self, backup_stubs):
         super().__init__()
@@ -38,6 +52,30 @@ class PrimaryReplica(BooksDatabase):
         for backup in self.backups:
             try:
                 backup.Write(request)
+            except Exception as e:
+                print(f"Failed to replicate to backup: {e}")
+        return books_database.WriteResponse(success=True)
+    
+    def DecrementStock(self, request, context):
+        stock = self.store.get(request.title, 0)
+        if stock<request.amount or request.amount<0:
+            return books_database.WriteResponse(success=False)
+        self.store[request.title] = stock-request.amount
+        for backup in self.backups:
+            try:
+                backup.DecrementStock(request)
+            except Exception as e:
+                print(f"Failed to replicate to backup: {e}")
+        return books_database.WriteResponse(success=True)
+    
+    def IncrementStock(self, request, context):
+        stock = self.store.get(request.title, 0)
+        if request.amount < 0:
+            return books_database.WriteResponse(success=False)
+        self.store[request.title] = stock+ request.amount
+        for backup in self.backups:
+            try:
+                backup.IncrementStock(request)
             except Exception as e:
                 print(f"Failed to replicate to backup: {e}")
         return books_database.WriteResponse(success=True)
