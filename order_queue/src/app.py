@@ -37,7 +37,7 @@ class OrderQueueService(order_queue_grpc.OrderQueueServiceServicer):
         self._queue = queue.PriorityQueue()
     
     def Enqueue(self, request, context):
-        print("ENQUEUED:", request)
+        # print("ENQUEUED:", request)
         self._queue.put(RequestWithPriority(request))
         return common.Empty()
     

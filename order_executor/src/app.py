@@ -73,7 +73,8 @@ class OrderExecutorService:
             self.leader_id = self.executor_id
             for id in self.known_ids:
                 self.send_declare_victory(id)
-    def execute_order(title, quantity, db_stub):
+    
+    def execute_order(self, title, quantity, db_stub):
         #Read current stock
         response = db_stub.Read(books_database.ReadRequest(title=title))
         current_stock = response.stock
@@ -104,8 +105,13 @@ class OrderExecutorService:
                         else:
                             raise
                     
-                    print("PROCESSING ORDER:", order)
-                    # Process order here  
+                    print("PROCESSING ORDER:", str(order).replace('\n', ' '))
+                    # Process order here
+                    with grpc.insecure_channel(f'books_database:50051') as db_channel:
+                        db_stub = books_database_grpc.BooksDatabaseStub(db_channel)
+                        for item in order.items:
+                            if not self.execute_order(item.name, item.quantity, db_stub):
+                                print(f"WARNING: Order for {item.quantity} copies of {item.name} failed, not enough stock")
                 else:
                     # Is not leader
                     

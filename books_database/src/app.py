@@ -41,7 +41,7 @@ class BooksDatabase(books_database_grpc.BooksDatabaseServicer):
             return books_database.WriteResponse(success=False)
         self.store[request.title] = stock+ request.amount
         return books_database.WriteResponse(success=True)
-    
+
 class PrimaryReplica(BooksDatabase):
     def __init__(self, backup_stubs):
         super().__init__()
@@ -79,3 +79,19 @@ class PrimaryReplica(BooksDatabase):
             except Exception as e:
                 print(f"Failed to replicate to backup: {e}")
         return books_database.WriteResponse(success=True)
+
+def serve():
+    # Create a gRPC server
+    server = grpc.server(futures.ThreadPoolExecutor())
+    books_database_grpc.add_BooksDatabaseServicer_to_server(BooksDatabase(), server)
+    # Listen on port 50051
+    port = "50051"
+    server.add_insecure_port("[::]:" + port)
+    # Start the server
+    server.start()
+    print("Server started. Listening on port 50051.")
+    # Keep thread alive
+    server.wait_for_termination()
+
+if __name__ == '__main__':
+    serve()
