@@ -26,6 +26,8 @@ from concurrent import futures
 import grpc
 import order_queue_pb2 as order_queue
 import order_queue_pb2_grpc as order_queue_grpc
+import books_database_pb2 as books_database
+import books_database_pb2_grpc as books_database_grpc
 import docker
 import time
 
@@ -71,7 +73,21 @@ class OrderExecutorService:
             self.leader_id = self.executor_id
             for id in self.known_ids:
                 self.send_declare_victory(id)
+    def execute_order(title, quantity, db_stub):
+        #Read current stock
+        response = db_stub.Read(books_database.ReadRequest(title=title))
+        current_stock = response.stock
 
+        #Check that enough books in stock
+        if current_stock >= quantity:
+            new_stock = current_stock - quantity
+            write_response = db_stub.Write(books_database.WriteRequest(
+                title=title,
+                new_stock=new_stock
+            ))
+            return write_response.success
+        return False #Too few in stock 
+    
     def run(self):
         with grpc.insecure_channel('order_queue:50051') as order_queue_channel:
             order_queue_stub = order_queue_grpc.OrderQueueServiceStub(order_queue_channel)
@@ -89,6 +105,7 @@ class OrderExecutorService:
                             raise
                     
                     print("PROCESSING ORDER:", order)
+                    # Process order here  
                 else:
                     # Is not leader
                     
