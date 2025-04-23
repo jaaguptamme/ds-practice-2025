@@ -24,27 +24,41 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0c\x63ommon.proto\x12\x06\x63ommon\"\x1d\n\x0bVectorClock\x12\x0e\n\x06\x63locks\x18\x01 \x03(\r\"F\n\x07Request\x12\x10\n\x08order_id\x18\x01 \x01(\t\x12)\n\x0cvector_clock\x18\x02 \x01(\x0b\x32\x13.common.VectorClock\"T\n\x08Response\x12\x0c\n\x04\x66\x61il\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\x12)\n\x0cvector_clock\x18\x03 \x01(\x0b\x32\x13.common.VectorClock\"&\n\x04Item\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x10\n\x08quantity\x18\x02 \x01(\x05\"O\n\x12InitAllInfoRequest\x12\x10\n\x08order_id\x18\x01 \x01(\t\x12\'\n\x07request\x18\x02 \x01(\x0b\x32\x16.common.AllInfoRequest\"\xb9\x01\n\x0e\x41llInfoRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0f\n\x07\x63ontact\x18\x02 \x01(\t\x12\x1a\n\x12\x63redit_card_number\x18\x03 \x01(\t\x12\x17\n\x0f\x65xpiration_date\x18\x04 \x01(\t\x12\x0b\n\x03\x63vv\x18\x05 \x01(\x05\x12\x17\n\x0f\x62illing_address\x18\x06 \x01(\t\x12\x10\n\x08quantity\x18\x07 \x01(\x05\x12\x1b\n\x05items\x18\x08 \x03(\x0b\x32\x0c.common.Item\"A\n\x10ItemsInitRequest\x12\x10\n\x08order_id\x18\x01 \x01(\t\x12\x1b\n\x05items\x18\x02 \x03(\x0b\x32\x0c.common.Item\"\x07\n\x05\x45mptyb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0c\x63ommon.proto\x12\x06\x63ommon\"\"\n\x0ePrepareRequest\x12\x10\n\x08order_id\x18\x01 \x01(\t\" \n\x0fPrepareResponse\x12\r\n\x05ready\x18\x01 \x01(\x08\"!\n\rCommitRequest\x12\x10\n\x08order_id\x18\x01 \x01(\t\"!\n\x0e\x43ommitResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\" \n\x0c\x41\x62ortRequest\x12\x10\n\x08order_id\x18\x01 \x01(\t\" \n\rAbortResponse\x12\x0f\n\x07\x61\x62orted\x18\x01 \x01(\x08\"\x1d\n\x0bVectorClock\x12\x0e\n\x06\x63locks\x18\x01 \x03(\r\"F\n\x07Request\x12\x10\n\x08order_id\x18\x01 \x01(\t\x12)\n\x0cvector_clock\x18\x02 \x01(\x0b\x32\x13.common.VectorClock\"T\n\x08Response\x12\x0c\n\x04\x66\x61il\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\x12)\n\x0cvector_clock\x18\x03 \x01(\x0b\x32\x13.common.VectorClock\"&\n\x04Item\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x10\n\x08quantity\x18\x02 \x01(\x05\"O\n\x12InitAllInfoRequest\x12\x10\n\x08order_id\x18\x01 \x01(\t\x12\'\n\x07request\x18\x02 \x01(\x0b\x32\x16.common.AllInfoRequest\"\xb9\x01\n\x0e\x41llInfoRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0f\n\x07\x63ontact\x18\x02 \x01(\t\x12\x1a\n\x12\x63redit_card_number\x18\x03 \x01(\t\x12\x17\n\x0f\x65xpiration_date\x18\x04 \x01(\t\x12\x0b\n\x03\x63vv\x18\x05 \x01(\x05\x12\x17\n\x0f\x62illing_address\x18\x06 \x01(\t\x12\x10\n\x08quantity\x18\x07 \x01(\x05\x12\x1b\n\x05items\x18\x08 \x03(\x0b\x32\x0c.common.Item\"A\n\x10ItemsInitRequest\x12\x10\n\x08order_id\x18\x01 \x01(\t\x12\x1b\n\x05items\x18\x02 \x03(\x0b\x32\x0c.common.Item\"\x07\n\x05\x45mpty2\xbf\x01\n\x12TransactionService\x12:\n\x07Prepare\x12\x16.common.PrepareRequest\x1a\x17.common.PrepareResponse\x12\x37\n\x06\x43ommit\x12\x15.common.CommitRequest\x1a\x16.common.CommitResponse\x12\x34\n\x05\x41\x62ort\x12\x14.common.AbortRequest\x1a\x15.common.AbortResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'common_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
-  _globals['_VECTORCLOCK']._serialized_start=24
-  _globals['_VECTORCLOCK']._serialized_end=53
-  _globals['_REQUEST']._serialized_start=55
-  _globals['_REQUEST']._serialized_end=125
-  _globals['_RESPONSE']._serialized_start=127
-  _globals['_RESPONSE']._serialized_end=211
-  _globals['_ITEM']._serialized_start=213
-  _globals['_ITEM']._serialized_end=251
-  _globals['_INITALLINFOREQUEST']._serialized_start=253
-  _globals['_INITALLINFOREQUEST']._serialized_end=332
-  _globals['_ALLINFOREQUEST']._serialized_start=335
-  _globals['_ALLINFOREQUEST']._serialized_end=520
-  _globals['_ITEMSINITREQUEST']._serialized_start=522
-  _globals['_ITEMSINITREQUEST']._serialized_end=587
-  _globals['_EMPTY']._serialized_start=589
-  _globals['_EMPTY']._serialized_end=596
+  _globals['_PREPAREREQUEST']._serialized_start=24
+  _globals['_PREPAREREQUEST']._serialized_end=58
+  _globals['_PREPARERESPONSE']._serialized_start=60
+  _globals['_PREPARERESPONSE']._serialized_end=92
+  _globals['_COMMITREQUEST']._serialized_start=94
+  _globals['_COMMITREQUEST']._serialized_end=127
+  _globals['_COMMITRESPONSE']._serialized_start=129
+  _globals['_COMMITRESPONSE']._serialized_end=162
+  _globals['_ABORTREQUEST']._serialized_start=164
+  _globals['_ABORTREQUEST']._serialized_end=196
+  _globals['_ABORTRESPONSE']._serialized_start=198
+  _globals['_ABORTRESPONSE']._serialized_end=230
+  _globals['_VECTORCLOCK']._serialized_start=232
+  _globals['_VECTORCLOCK']._serialized_end=261
+  _globals['_REQUEST']._serialized_start=263
+  _globals['_REQUEST']._serialized_end=333
+  _globals['_RESPONSE']._serialized_start=335
+  _globals['_RESPONSE']._serialized_end=419
+  _globals['_ITEM']._serialized_start=421
+  _globals['_ITEM']._serialized_end=459
+  _globals['_INITALLINFOREQUEST']._serialized_start=461
+  _globals['_INITALLINFOREQUEST']._serialized_end=540
+  _globals['_ALLINFOREQUEST']._serialized_start=543
+  _globals['_ALLINFOREQUEST']._serialized_end=728
+  _globals['_ITEMSINITREQUEST']._serialized_start=730
+  _globals['_ITEMSINITREQUEST']._serialized_end=795
+  _globals['_EMPTY']._serialized_start=797
+  _globals['_EMPTY']._serialized_end=804
+  _globals['_TRANSACTIONSERVICE']._serialized_start=807
+  _globals['_TRANSACTIONSERVICE']._serialized_end=998
 # @@protoc_insertion_point(module_scope)

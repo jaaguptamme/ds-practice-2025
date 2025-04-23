@@ -2,6 +2,36 @@ syntax = "proto3";
 
 package common;
 
+service TransactionService {
+    rpc Prepare (common.PrepareRequest) returns (common.PrepareResponse);
+    rpc Commit (common.CommitRequest) returns (common.CommitResponse);
+    rpc Abort (common.AbortRequest) returns (common.AbortResponse);
+}
+
+message PrepareRequest {
+    string order_id = 1;
+}
+
+message PrepareResponse {
+    bool ready = 1;
+}
+
+message CommitRequest {
+    string order_id = 1;
+}
+
+message CommitResponse {
+    bool success = 1;
+}
+
+message AbortRequest {
+    string order_id = 1;
+}
+
+message AbortResponse {
+    bool aborted = 1;
+}
+
 message VectorClock {
     repeated uint32 clocks = 1;
 }
