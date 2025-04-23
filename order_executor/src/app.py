@@ -75,20 +75,9 @@ class OrderExecutorService:
             for id in self.known_ids:
                 self.send_declare_victory(id)
     
-    def execute_order(self, title, quantity, db_stub):
-        #Read current stock
-        response = db_stub.Read(books_database.ReadRequest(title=title))
-        current_stock = response.stock
-
-        #Check that enough books in stock
-        if current_stock >= quantity:
-            new_stock = current_stock - quantity
-            write_response = db_stub.Write(books_database.WriteRequest(
-                title=title,
-                new_stock=new_stock
-            ))
-            return write_response.success
-        return False #Too few in stock 
+    def execute_order(self, title: str, quantity: int, db_stub: books_database_grpc.BooksDatabaseStub):
+        response = db_stub.DecrementStock(books_database.ChangeRequest(title=title, amount=quantity))
+        return response.success # If False then too few in stock 
     
     def two_phase_commit(order_id, title, new_stock, participants):
         #Prepare

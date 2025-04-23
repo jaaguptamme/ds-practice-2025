@@ -19,7 +19,11 @@ import time
 
 class BooksDatabase(books_database_grpc.BooksDatabaseServicer):
     def __init__(self):
-        self.store = {}
+        self.store = {
+            'Book A': 500,
+            'Book B': 70,
+            'Book C': 10000000,
+        }
 
     def Read(self, request, context):
         stock = self.store.get(request.title, 0)
