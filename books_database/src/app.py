@@ -9,6 +9,7 @@ grpc_path = os.path.abspath(os.path.join(FILE, '../../../utils/pb'))
 sys.path.insert(0, grpc_path)
 
 import common_pb2 as common
+import common_pb2_grpc as common_grpc
 import books_database_pb2 as books_database
 import books_database_pb2_grpc as books_database_grpc
 from concurrent import futures
@@ -79,6 +80,21 @@ class PrimaryReplica(BooksDatabase):
             except Exception as e:
                 print(f"Failed to replicate to backup: {e}")
         return books_database.WriteResponse(success=True)
+    
+class DatabaseParticipant(common_grpc.TransactionService):
+    def __init__(self):
+        self.temp_updates = {}
+    def Prepare(self, request, context):
+        self.temp_updates[request.order_id] = request.new_stock 
+        return common.PrepareResponse(ready=True)
+    def Commit(self, request, context):
+        update = self.temp_updates.pop(request.order_id, None)
+        if update:
+            self.store[request.title] = update
+        return common.CommitResponse(success=True)
+    def Abort(self, request, context):
+        self.temp_updates.pop(request.order_id, None)
+        return common.AbortResponse(aborted=True)
 
 def serve():
     # Create a gRPC server
