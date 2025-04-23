@@ -2,8 +2,6 @@ syntax = "proto3";
 
 package books_db;
 
-import "common.proto";
-
 service BooksDatabase {
     rpc Read (ReadRequest) returns (ReadResponse);
     rpc Write (WriteRequest) returns (WriteResponse);

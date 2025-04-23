@@ -10,7 +10,7 @@ service TransactionService {
 
 message PrepareRequest {
     string order_id = 1;
-    int32 new_stock = 2;
+    int32 amount = 2;
     string title = 3;
 }
 

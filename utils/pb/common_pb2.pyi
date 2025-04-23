@@ -6,14 +6,14 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class PrepareRequest(_message.Message):
-    __slots__ = ("order_id", "new_stock", "title")
+    __slots__ = ("order_id", "amount", "title")
     ORDER_ID_FIELD_NUMBER: _ClassVar[int]
-    NEW_STOCK_FIELD_NUMBER: _ClassVar[int]
+    AMOUNT_FIELD_NUMBER: _ClassVar[int]
     TITLE_FIELD_NUMBER: _ClassVar[int]
     order_id: str
-    new_stock: int
+    amount: int
     title: str
-    def __init__(self, order_id: _Optional[str] = ..., new_stock: _Optional[int] = ..., title: _Optional[str] = ...) -> None: ...
+    def __init__(self, order_id: _Optional[str] = ..., amount: _Optional[int] = ..., title: _Optional[str] = ...) -> None: ...
 
 class PrepareResponse(_message.Message):
     __slots__ = ("ready",)

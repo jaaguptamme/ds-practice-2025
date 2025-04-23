@@ -75,16 +75,16 @@ class OrderExecutorService:
             for id in self.known_ids:
                 self.send_declare_victory(id)
     
-    def execute_order(self, title: str, quantity: int, db_stub: books_database_grpc.BooksDatabaseStub):
-        response = db_stub.DecrementStock(books_database.ChangeRequest(title=title, amount=quantity))
-        return response.success # If False then too few in stock 
+    # def execute_order(self, title: str, quantity: int, db_stub: books_database_grpc.BooksDatabaseStub):
+    #     response = db_stub.DecrementStock(books_database.ChangeRequest(title=title, amount=quantity))
+    #     return response.success # If False then too few in stock 
     
-    def two_phase_commit(order_id, title, new_stock, participants):
+    def two_phase_commit(self, order_id: str, title: str, amount: int, participants: list[common_grpc.TransactionServiceStub]) -> bool:
         #Prepare
         ready_votes = []
         for service in participants:
             try:
-                response = service.Prepare(common.PrepareRequest(order_id=order_id, new_stock=new_stock, title=title))
+                response = service.Prepare(common.PrepareRequest(order_id=order_id, amount=amount, title=title))
                 ready_votes.append(response.ready)
             except Exception:
                 ready_votes.append(False)
@@ -92,10 +92,12 @@ class OrderExecutorService:
             for service in participants:
                 service.Commit(common.CommitRequest(order_id=order_id, title=title))
             print("All services commited")
+            return True
         else:
             for service in participants:
                 service.Abort(common.AbortRequest(order_id=order_id))
             print("Transaction aborted")
+            return False
 
     def run(self):
         with grpc.insecure_channel('order_queue:50051') as order_queue_channel:
@@ -115,10 +117,11 @@ class OrderExecutorService:
                     
                     print("PROCESSING ORDER:", str(order).replace('\n', ' '))
                     # Process order here
-                    with grpc.insecure_channel(f'books_database:50051') as db_channel:
-                        db_stub = books_database_grpc.BooksDatabaseStub(db_channel)
+                    with grpc.insecure_channel('books_database:50051') as db_channel, grpc.insecure_channel('payment:50051') as payment_channel:
+                        db_stub = common_grpc.TransactionServiceStub(db_channel)
+                        payment_stub = common_grpc.TransactionServiceStub(payment_channel)
                         for item in order.items:
-                            if not self.execute_order(item.name, item.quantity, db_stub):
+                            if not self.two_phase_commit(order.order_id, item.name, item.quantity, [db_stub, payment_stub]):
                                 print(f"WARNING: Order for {item.quantity} copies of {item.name} failed, not enough stock")
                 else:
                     # Is not leader
