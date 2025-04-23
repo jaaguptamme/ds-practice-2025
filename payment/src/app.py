@@ -12,8 +12,6 @@ grpc_path = os.path.abspath(os.path.join(FILE, '../../../utils/pb'))
 sys.path.insert(0, grpc_path)
 import common_pb2 as common
 import common_pb2_grpc as common_grpc
-import transaction_verification_pb2 as transaction_verification
-import transaction_verification_pb2_grpc as transaction_verification_grpc
 
 import grpc
 from concurrent import futures

@@ -22,6 +22,7 @@ grpc_path = os.path.abspath(os.path.join(FILE, '../../../utils/pb'))
 sys.path.insert(0, grpc_path)
 
 import common_pb2 as common
+import common_pb2_grpc as common_grpc
 from concurrent import futures
 import grpc
 import order_queue_pb2 as order_queue
@@ -89,6 +90,24 @@ class OrderExecutorService:
             return write_response.success
         return False #Too few in stock 
     
+    def two_phase_commit(order_id, title, new_stock, participants):
+        #Prepare
+        ready_votes = []
+        for service in participants:
+            try:
+                response = service.Prepare(common.PrepareRequest(order_id=order_id, new_stock=new_stock, title=title))
+                ready_votes.append(response.ready)
+            except Exception:
+                ready_votes.append(False)
+        if all(ready_votes):
+            for service in participants:
+                service.Commit(common.CommitRequest(order_id=order_id, title=title))
+            print("All services commited")
+        else:
+            for service in participants:
+                service.Abort(common.AbortRequest(order_id=order_id))
+            print("Transaction aborted")
+
     def run(self):
         with grpc.insecure_channel('order_queue:50051') as order_queue_channel:
             order_queue_stub = order_queue_grpc.OrderQueueServiceStub(order_queue_channel)
