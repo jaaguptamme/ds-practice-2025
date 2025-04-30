@@ -1,3 +1,14 @@
+"""
+Books Database Service
+
+Manages the inventory of books, meaning stock levels for each book. 
+
+Called by order executor and propagates info from master node to other replcase
+
+Supports Prepare, Commit, and Abort operations for distributed transactions.
+Ensures consistency between the primary and backup replicas using gRPC communication.
+
+"""
 import sys
 import os
 
