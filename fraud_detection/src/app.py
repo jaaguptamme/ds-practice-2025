@@ -56,10 +56,10 @@ class FraudService(fraud_detection_grpc.FraudServiceServicer):
         totalAmount=sum([item.quantity for item in items])
         if(len(items)>=10):
             fail = True
-            message = "Ordered too many items"
+            message = "Ordered too many different items"
         elif(totalAmount>=10):
             fail = True
-            message = "Ordered too many of the same item"
+            message = "Ordered too many items total"
         else:
             valid  = re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', data.contact)
             if valid == False:
