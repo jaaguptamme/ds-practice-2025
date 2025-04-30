@@ -36,7 +36,8 @@ If a backend service (e.g., fraud detection) fails, the orchestrator will handle
 Data Consistency Issues:
 Vector clocks are used to maintain consistency across services.
 
-
+Leader Election Failures:
+The Bully Algorithm ensures that a new leader is elected if the current leader fails. The algorithm selects the replica with the highest ID as the leader.
 
 
 # Vector clocks diagram:
