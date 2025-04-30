@@ -11,6 +11,7 @@ Sends correct orders to Order Queue Service.
 import random
 import sys
 import os
+import time
 
 # This set of lines are needed to import the gRPC stubs.
 # The path of the stubs is relative to the current file, or absolute inside the container.
@@ -27,7 +28,10 @@ import suggestions_pb2 as suggestions
 import suggestions_pb2_grpc as suggestions_grpc
 import order_queue_pb2 as order_queue
 import order_queue_pb2_grpc as order_queue_grpc
+import books_database_pb2 as books_database
+import books_database_pb2_grpc as books_database_grpc
 
+import docker
 import grpc
 from google.protobuf.json_format import MessageToDict
 
@@ -108,10 +112,11 @@ from flask import Flask, request
 from flask_cors import CORS
 import json
 import threading
-import concurrent.futures
 
 # Create a simple Flask app.
 app = Flask(__name__)
+# Disable sorting of keys in JSON responses
+app.json.sort_keys = False
 # Enable CORS for the app.
 CORS(app, resources={r'/*': {'origins': '*'}})
 
@@ -265,6 +270,27 @@ def FraudVerificationSuggestions(request_data):
             'suggestedBooks': [],
         }
 
+def get_db_replica_ids():
+    client = docker.from_env()
+    
+    known_ids = ['books_database_primary']
+    for container in client.containers.list(all=True):
+        if container.labels.get('com.docker.compose.service') == 'books_database':
+            known_ids.append(container.short_id)
+    
+    return known_ids
+
+db_replica_ids = get_db_replica_ids()
+
+def get_inventory(book_title: str):  
+    values = {}
+    for id in db_replica_ids:
+        with grpc.insecure_channel(f'{id}:50051') as channel:
+            stub = books_database_grpc.BooksDatabaseStub(channel)
+            values[id] = stub.Read(books_database.ReadRequest(title=book_title)).stock
+
+    return values
+
 @app.route('/checkout', methods=['POST'])
 def checkout():
     """
@@ -275,6 +301,15 @@ def checkout():
     
     # Make requests to other services and return response
     return FraudVerificationSuggestions(request_data)
+
+@app.route('/inventory', methods=['GET'])
+def inventory():
+    """
+    Responds with a JSON object containing database value for each replica. For debugging purposes.
+    """
+    book_title = request.args.get('title')
+    
+    return get_inventory(book_title)
 
 
 if __name__ == '__main__':
