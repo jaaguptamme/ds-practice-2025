@@ -1,5 +1,11 @@
 """
+Payment Service
 
+Handles payment transactions for orders. 
+
+Supports Prepare, Commit, and Abort operations for distributed transactions.
+Ensures that payments are either fully processed or rolled back in case of failure.
+Provides gRPC endpoints for transaction management.
 """
 import sys
 import os
