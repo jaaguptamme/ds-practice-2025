@@ -59,7 +59,7 @@ class BooksDatabase(books_database_grpc.BooksDatabaseServicer, common_grpc.Trans
         prepared_request = self.temp_updates.pop(request.order_id, None)
         if prepared_request is not None:
             response = self.DecrementStock(prepared_request, context)
-            print(f"Database update commited for order {request.order_id}; new stock: {self.store.get(request.title, None)}")
+            print(f"Database update commited for order {request.order_id}, book {request.title}; new stock: {self.store.get(request.title, None)}")
             return common.CommitResponse(success=response.success)
         else:
             return common.CommitResponse(success=False)
