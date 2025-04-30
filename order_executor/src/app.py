@@ -117,7 +117,7 @@ class OrderExecutorService:
                     
                     print("PROCESSING ORDER:", str(order).replace('\n', ' '))
                     # Process order here
-                    with grpc.insecure_channel('books_database:50051') as db_channel, grpc.insecure_channel('payment:50051') as payment_channel:
+                    with grpc.insecure_channel('books_database_primary:50051') as db_channel, grpc.insecure_channel('payment:50051') as payment_channel:
                         db_stub = common_grpc.TransactionServiceStub(db_channel)
                         payment_stub = common_grpc.TransactionServiceStub(payment_channel)
                         for item in order.items:

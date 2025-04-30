@@ -13,6 +13,7 @@ import common_pb2_grpc as common_grpc
 import books_database_pb2 as books_database
 import books_database_pb2_grpc as books_database_grpc
 from concurrent import futures
+import docker
 import grpc
 
 class BooksDatabase(books_database_grpc.BooksDatabaseServicer, common_grpc.TransactionService):
@@ -30,20 +31,6 @@ class BooksDatabase(books_database_grpc.BooksDatabaseServicer, common_grpc.Trans
     
     def Write(self, request, context):
         self.store[request.title] = request.new_stock
-        return books_database.WriteResponse(success=True)
-    
-    def DecrementStock(self, request, context):
-        stock = self.store.get(request.title, 0)
-        if stock < request.amount or request.amount < 0:
-            return books_database.WriteResponse(success=False)
-        self.store[request.title] = stock - request.amount
-        return books_database.WriteResponse(success=True)
-    
-    def IncrementStock(self, request, context):
-        stock = self.store.get(request.title, 0)
-        if request.amount < 0:
-            return books_database.WriteResponse(success=False)
-        self.store[request.title] = stock+ request.amount
         return books_database.WriteResponse(success=True)
     
     # 2PC
@@ -71,7 +58,7 @@ class BooksDatabase(books_database_grpc.BooksDatabaseServicer, common_grpc.Trans
         return common.AbortResponse(aborted=True)
 
 class PrimaryReplica(BooksDatabase):
-    def __init__(self, backup_stubs):
+    def __init__(self, backup_stubs: list[books_database_grpc.BooksDatabaseStub]):
         super().__init__()
         self.backups = backup_stubs
     
@@ -90,11 +77,11 @@ class PrimaryReplica(BooksDatabase):
         stock = self.store.get(request.title, 0)
         if stock < request.amount or request.amount < 0:
             return books_database.WriteResponse(success=False)
-        self.store[request.title] = stock-request.amount
+        self.store[request.title] = stock - request.amount
         
         for backup in self.backups:
             try:
-                backup.DecrementStock(request)
+                backup.Write(books_database.WriteRequest(title=request.title, new_stock=self.store[request.title]))
             except Exception as e:
                 print(f"Failed to replicate to backup: {e}")
         
@@ -104,22 +91,45 @@ class PrimaryReplica(BooksDatabase):
         stock = self.store.get(request.title, 0)
         if request.amount < 0:
             return books_database.WriteResponse(success=False)
-        self.store[request.title] = stock+ request.amount
+        self.store[request.title] = stock + request.amount
         
         for backup in self.backups:
             try:
-                backup.IncrementStock(request)
+                backup.Write(books_database.WriteRequest(title=request.title, new_stock=self.store[request.title]))
             except Exception as e:
                 print(f"Failed to replicate to backup: {e}")
         
         return books_database.WriteResponse(success=True)
 
+def get_backup_ids():
+    client = docker.from_env()
+    
+    known_ids = []
+    for container in client.containers.list(all=True):
+        if container.labels.get('com.docker.compose.service') == 'books_database':
+            known_ids.append(container.short_id)
+
+    return known_ids
+
 def serve():
+    is_primary = os.getenv('IS_PRIMARY', '').upper() == 'TRUE'
+
     # Create a gRPC server
     server = grpc.server(futures.ThreadPoolExecutor())
-    service = BooksDatabase()
+    
+    if is_primary:
+        backup_stubs = []
+        for backup_id in get_backup_ids():
+            channel = grpc.insecure_channel(f'{backup_id}:50051')
+            stub = books_database_grpc.BooksDatabaseStub(channel)
+            backup_stubs.append(stub)
+        service = PrimaryReplica(backup_stubs)
+    else:
+        service = BooksDatabase()
+    
     books_database_grpc.add_BooksDatabaseServicer_to_server(service, server)
     common_grpc.add_TransactionServiceServicer_to_server(service, server)
+    
     # Listen on port 50051
     port = "50051"
     server.add_insecure_port("[::]:" + port)
