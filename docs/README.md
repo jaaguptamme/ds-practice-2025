@@ -39,6 +39,23 @@ Vector clocks are used to maintain consistency across services.
 Leader Election Failures:
 The Bully Algorithm ensures that a new leader is elected if the current leader fails. The algorithm selects the replica with the highest ID as the leader.
 
+# Consistency Protocol
+The system uses a **Primary-Based Protocol** to ensure consistency across the distributed databases. In this approach:
+A **Primary Book Database Replica** is responsible for handling all write operations and propagating updates to the **Backup Replicas**.
+Read operations can be performed on any replica.
+The primary replica ensures sequential consistency by applying updates in the same order across all replicas.
 
-# Vector clocks diagram:
-Separate file
+
+# Distributed Commitment Protocol
+The system uses the **Two-Phase Commit (2PC)** protocol to ensure consistency during distributed transactions. This protocol is implemented in the **Books Database** and **Payment Service** to handle critical operations like stock updates and payment processing.
+
+### Two-Phase Commit Workflow:
+1. **Prepare Phase**:
+The main order executor sends a `Prepare` request to all books database and payment service.
+Both of them check if can commit the transaction and responds with `Ready` or `Not Ready`.
+
+2. **Commit Phase**:
+If all backups respond with `Ready`, the order executor sends a `Commit` request to all backups.
+If any backup responds with `Not Ready`, the order executor sends an `Abort` request to all backups.
+
+This protocol ensures that transactions are either fully committed or fully rolled back, maintaining consistency across replicas.
