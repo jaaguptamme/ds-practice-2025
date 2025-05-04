@@ -75,10 +75,6 @@ class OrderExecutorService:
             for id in self.known_ids:
                 self.send_declare_victory(id)
     
-    # def execute_order(self, title: str, quantity: int, db_stub: books_database_grpc.BooksDatabaseStub):
-    #     response = db_stub.DecrementStock(books_database.ChangeRequest(title=title, amount=quantity))
-    #     return response.success # If False then too few in stock 
-    
     def two_phase_commit(self, order_id: str, title: str, amount: int, participants: list[common_grpc.TransactionServiceStub]) -> bool:
         #Prepare
         ready_votes = []
