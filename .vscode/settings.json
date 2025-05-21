@@ -1,5 +1,6 @@
 {
     "python.analysis.extraPaths": [
-        "utils/pb"
+        "utils/pb",
+        "utils/tracing"
     ]
 }

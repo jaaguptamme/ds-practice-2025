@@ -25,6 +25,10 @@ import docker
 import grpc
 from google.protobuf.json_format import MessageToDict
 
+from tracing import get_tracer_and_meter, trace
+
+tracer, meter = get_tracer_and_meter('orchestrator')
+
 def check_fraud(order_id) -> fraud_detection.OrderResponse:
     # Establish a connection with the fraud-detection gRPC service.
     with grpc.insecure_channel('fraud_detection:50051') as channel:
@@ -188,8 +192,13 @@ class BookException(Exception):
 class FailException(Exception):
     pass
 
+@tracer.start_as_current_span('checkout')
 def FraudVerificationSuggestions(request_data):
+    span = trace.get_current_span()
+    
     order_id = str(random.randrange(0, 1_000_000_000))
+    span.set_attribute('order_id', order_id)
+
     vectorClocks[order_id] = [0,0,0]
     with grpc.insecure_channel('fraud_detection:50051') as fraud_detection_channel:
         with grpc.insecure_channel('transaction_verification:50051') as transcation_verifiction_channel:
