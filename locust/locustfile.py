@@ -199,5 +199,5 @@ class WebsiteUserMultipleMixed(HttpUser):
 
 class WebsiteUserConflictingOrders(HttpUser):
     wait_time = between(1, 2)
-    tasks = [MultipleMixed]
+    tasks = [ConflictingOrders]
     host = "http://localhost:8081"
