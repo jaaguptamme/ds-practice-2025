@@ -1,3 +1,4 @@
+import os
 import sys
 import time
 import subprocess
@@ -15,6 +16,9 @@ python hotreload.py <script>
 """
 
 DIR_TO_WATCH = '/app'
+
+process_env = os.environ.copy()
+process_env['PYTHONPATH'] = process_env.get('PYTHONPATH', '') + ':utils/pb:utils/tracing'
 
 class OnAnyModifiedFileHandler(FileSystemEventHandler):
     def __init__(self, script, process):
@@ -50,11 +54,11 @@ class OnAnyModifiedFileHandler(FileSystemEventHandler):
             self.process.terminate()
             self.process.wait()
 
-        self.process = subprocess.Popen([sys.executable, self.script])
+        self.process = subprocess.Popen([sys.executable, self.script], env=process_env)
 
 
 def main(script):
-    process = subprocess.Popen([sys.executable, script])  # Start the script
+    process = subprocess.Popen([sys.executable, script], env=process_env)  # Start the script
     event_handler = OnAnyModifiedFileHandler(script, process)
     observer = PollingObserver()
     observer.schedule(event_handler, DIR_TO_WATCH, recursive=True)
