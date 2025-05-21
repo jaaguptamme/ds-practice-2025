@@ -18,14 +18,23 @@ from concurrent import futures
 import docker
 import grpc
 
+from opentelemetry.metrics import Observation
+from tracing import get_tracer_and_meter
+
+tracer, meter = get_tracer_and_meter('books_database')
+
 class BooksDatabase(books_database_grpc.BooksDatabaseServicer, common_grpc.TransactionService):
     def __init__(self):
         self.store = {
-            'Book A': 500,
+            'Book A': 200,
             'Book B': 70,
-            'Book C': 10000000,
+            'Book C': 120,
         }
-        self.temp_updates = {}
+        meter.create_observable_gauge(
+            'stored_books',
+            description='number of books stored in database',
+            callbacks=[lambda _: [Observation(v, {'title': k}) for k, v in self.store.items()]]
+        )
 
     def Read(self, request, context):
         stock = self.store.get(request.title, 0)
@@ -34,34 +43,11 @@ class BooksDatabase(books_database_grpc.BooksDatabaseServicer, common_grpc.Trans
     def Write(self, request, context):
         self.store[request.title] = request.new_stock
         return books_database.WriteResponse(success=True)
-    
-    # 2PC
-
-    # TODO: Preparing two decrements simultaneously might allow you to store negative amounts
-
-    def Prepare(self, request, context):
-        stock = self.store.get(request.title, 0)
-        if stock < request.amount or request.amount < 0:
-            return common.PrepareResponse(ready=False)
-        self.temp_updates[request.order_id] = request
-        return common.PrepareResponse(ready=True)
-
-    def Commit(self, request, context):
-        prepared_request = self.temp_updates.pop(request.order_id, None)
-        if prepared_request is not None:
-            response = self.DecrementStock(prepared_request, context)
-            print(f"Database update commited for order {request.order_id}, book {request.title}; new stock: {self.store.get(request.title, None)}")
-            return common.CommitResponse(success=response.success)
-        else:
-            return common.CommitResponse(success=False)
-
-    def Abort(self, request, context):
-        self.temp_updates.pop(request.order_id, None)
-        return common.AbortResponse(aborted=True)
 
 class PrimaryReplica(BooksDatabase):
     def __init__(self, backup_stubs: list[books_database_grpc.BooksDatabaseStub]):
         super().__init__()
+        self.temp_updates = {}
         self.backups = backup_stubs
     
     def Write(self, request, context):
@@ -102,6 +88,28 @@ class PrimaryReplica(BooksDatabase):
                 print(f"Failed to replicate to backup: {e}")
         
         return books_database.WriteResponse(success=True)
+    
+    # 2PC
+    
+    def Prepare(self, request, context):
+        stock = self.store.get(request.title, 0)
+        if stock < request.amount or request.amount < 0:
+            return common.PrepareResponse(ready=False)
+        self.temp_updates[request.order_id] = request
+        return common.PrepareResponse(ready=True)
+
+    def Commit(self, request, context):
+        prepared_request = self.temp_updates.pop(request.order_id, None)
+        if prepared_request is not None:
+            response = self.DecrementStock(prepared_request, context)
+            print(f"Database update commited for order {request.order_id}, book {request.title}; new stock: {self.store.get(request.title, None)}")
+            return common.CommitResponse(success=response.success)
+        else:
+            return common.CommitResponse(success=False)
+
+    def Abort(self, request, context):
+        self.temp_updates.pop(request.order_id, None)
+        return common.AbortResponse(aborted=True)
 
 def get_backup_ids():
     client = docker.from_env()

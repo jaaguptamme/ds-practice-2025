@@ -25,9 +25,13 @@ import docker
 import grpc
 from google.protobuf.json_format import MessageToDict
 
+from opentelemetry.instrumentation.threading import ThreadingInstrumentor
 from tracing import get_tracer_and_meter, trace
 
+ThreadingInstrumentor().instrument()
 tracer, meter = get_tracer_and_meter('orchestrator')
+
+order_sizes = meter.create_histogram('order_sizes', description='sizes of orders (total number of books)')
 
 def check_fraud(order_id) -> fraud_detection.OrderResponse:
     # Establish a connection with the fraud-detection gRPC service.
@@ -70,6 +74,7 @@ def initTransaction(order_id, request_data):
         request = transaction_verification.InitRequest(order_id=order_id, transaction_request=request)
         response = stub.initVerification(request)
     return response
+
 def initFraudVerification(order_id, request_data):
     with grpc.insecure_channel('fraud_detection:50051') as channel:
         # Create a stub object.
@@ -118,6 +123,7 @@ vectorClocks = dict() #order_id -> vector_clock
 def comibine_vector_clock(order_id, new_clock):
     vectorClocks[order_id] = [max(old, new) for old, new in zip(vectorClocks[order_id], new_clock.clocks)]
 
+@tracer.start_as_current_span('a')
 def event_a(order_id, transaction_stub: transaction_verification_grpc.VerificationServiceStub,
             fraud_detection_stub: fraud_detection_grpc.FraudServiceStub,
             suggestions_stub: suggestions_grpc.SuggestionServiceStub):
@@ -129,6 +135,7 @@ def event_a(order_id, transaction_stub: transaction_verification_grpc.Verificati
     print("VECTOR CLOCK A:",vectorClocks[order_id])
     event_c(order_id, transaction_stub, fraud_detection_stub, suggestions_stub)
 
+@tracer.start_as_current_span('b')
 def event_b(order_id, 
             transaction_stub: transaction_verification_grpc.VerificationServiceStub, 
             fraud_detection_stub: fraud_detection_grpc.FraudServiceStub,
@@ -142,6 +149,7 @@ def event_b(order_id,
     print("VECTOR CLOCK B:",vectorClocks[order_id])
     event_d(order_id, fraud_detection_stub,suggestions_stub)
 
+@tracer.start_as_current_span('c')
 def event_c(order_id,transaction_stub: transaction_verification_grpc.VerificationServiceStub,
             fraud_detection_stub: fraud_detection_grpc.FraudServiceStub,
             suggestions_stub: suggestions_grpc.SuggestionServiceStub):
@@ -154,6 +162,7 @@ def event_c(order_id,transaction_stub: transaction_verification_grpc.Verificatio
     print("VECTOR CLOCK C:",vectorClocks[order_id])
     event_e(order_id, fraud_detection_stub, suggestions_stub)
 
+@tracer.start_as_current_span('d')
 def event_d(order_id, fraud_detection_stub: fraud_detection_grpc.FraudServiceStub,
             suggestions_stub: suggestions_grpc.SuggestionServiceStub):
     print("EVENT D START: ", vectorClocks[order_id])
@@ -164,6 +173,7 @@ def event_d(order_id, fraud_detection_stub: fraud_detection_grpc.FraudServiceStu
     comibine_vector_clock(order_id, resp.vector_clock)
     event_e(order_id, fraud_detection_stub, suggestions_stub)
 
+@tracer.start_as_current_span('e')
 def event_e(order_id, 
             fraud_detection_stub: fraud_detection_grpc.FraudServiceStub,
             suggestions_stub: suggestions_grpc.SuggestionServiceStub):
@@ -178,6 +188,7 @@ def event_e(order_id,
     comibine_vector_clock(order_id, resp.vector_clock)
     event_f(order_id, suggestions_stub)
 
+@tracer.start_as_current_span('f')
 def event_f(order_id,
             suggestions_stub: suggestions_grpc.SuggestionServiceStub):
     print("EVENT F START: ", vectorClocks[order_id])
@@ -254,6 +265,7 @@ def FraudVerificationSuggestions(request_data):
                         order_queue_stub = order_queue_grpc.OrderQueueServiceStub(order_queue_channel)
                         items_to_send = common.ItemsInitRequest(order_id=order_id, items=request_data.get('items', []))
                         order_queue_stub.Enqueue(items_to_send)
+                    order_sizes.record(general_request.request.quantity)
                     # Finally return books to frontend
                     return {
                         'orderId': order_id,
@@ -265,7 +277,7 @@ def FraudVerificationSuggestions(request_data):
 
     return {
             'orderId': order_id,
-            'status': f'Order Rejected',
+            'status': 'Order Rejected',
             'suggestedBooks': [],
         }
 

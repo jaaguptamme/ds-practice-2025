@@ -12,6 +12,13 @@ from concurrent import futures
 import grpc
 import order_queue_pb2_grpc as order_queue_grpc
 
+from tracing import get_tracer_and_meter
+
+tracer, meter = get_tracer_and_meter('order_queue')
+
+orders_queued = meter.create_up_down_counter('orders_queued', description='number of orders currently queued in order queue')
+orders_accepted = meter.create_counter('orders_accepted', description='number of orders accepted by order queue')
+books_ordered = meter.create_counter('books_ordered', description='number of books ordered based on orders accepted by order queue')
 
 class RequestWithPriority:
     def __init__(self, request):
@@ -27,13 +34,16 @@ class OrderQueueService(order_queue_grpc.OrderQueueServiceServicer):
         self._queue = queue.PriorityQueue()
     
     def Enqueue(self, request, context):
-        # print("ENQUEUED:", request)
         self._queue.put(RequestWithPriority(request))
+        orders_queued.add(1)
+        orders_accepted.add(1)
+        books_ordered.add(sum([item.quantity for item in request.items]))
         return common.Empty()
     
     def Dequeue(self, request, context):
         try:
             request = self._queue.get(timeout=2).request
+            orders_queued.add(-1)
             return request
         except queue.Empty:
             context.abort(grpc.StatusCode.ABORTED, 'Queue empty')
