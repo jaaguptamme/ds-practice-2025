@@ -50,7 +50,7 @@ class BaseOrderMaking(TaskSet):
 
 class SingleCorrectOrder(BaseOrderMaking):
     @task
-    def makeCorrectOrder(self):
+    def CorrectOrder(self):
         data = userAndFinancialData.copy()
         data["items"] = books
         #print(f"Making order with data: {data}")
@@ -58,7 +58,7 @@ class SingleCorrectOrder(BaseOrderMaking):
 
 class MultipleCorrectOrder(BaseOrderMaking):
     @task
-    def makeCorrectOrderA(self):
+    def CorrectOrderA(self):
         data = userAndFinancialData.copy()
         data["items"] = [ {
                 "name": "Book A",
@@ -68,7 +68,7 @@ class MultipleCorrectOrder(BaseOrderMaking):
         self.makeOrder(data)
 
     @task
-    def makeCorrectOrderB(self):
+    def CorrectOrderB(self):
         data = userAndFinancialData.copy()
         data["items"] = [ {
                 "name": "Book B",
@@ -78,7 +78,7 @@ class MultipleCorrectOrder(BaseOrderMaking):
         self.makeOrder(data)
     
     @task
-    def makeCorrectOrderC(self):
+    def CorrectOrderC(self):
         data = userAndFinancialData.copy()
         data["items"] = [ {
                 "name": "Book C",
@@ -87,6 +87,100 @@ class MultipleCorrectOrder(BaseOrderMaking):
         #print(f"Making order with data: {data}")
         self.makeOrder(data)
 
+def MultipleMixed(BaseOrderMaking):
+    @task
+    def CorrectOrderA(self):
+        data = userAndFinancialData.copy()
+        data["items"] = [ {
+                "name": "Book A",
+                "quantity": 1
+        }]
+        self.makeOrder(data)
+
+    @task
+    def FradulentOrderB(self):
+        data = userAndFinancialData.copy()
+        data["creditCard"]["expirationDate"] = "12/20"
+        data["items"] = [ {
+                "name": "Book B",
+                "quantity": 3
+        }]
+        self.makeOrder(data)
+    @task
+    def FraudulentOrderC(self):
+        data = userAndFinancialData.copy()
+        data["creditCard"]["number"] = "123"
+        data["items"] = [ {
+                "name": "Book C",
+                "quantity": 2
+        }]
+        self.makeOrder(data)
+    @task
+    def FraudulentOrderD(self):
+        data = userAndFinancialData.copy()
+        data["user"]["contact"] = "abcnotanemail"
+        data["items"] = [ {
+                "name": "Book D",
+                "quantity": 2
+        }]
+        self.makeOrder(data)
+
+def ConflictingOrders(BaseOrderMaking):
+    @task
+    def CorrectOrderA(self):
+        data = userAndFinancialData.copy()
+        data["items"] = [ {
+                "name": "Book A",
+                "quantity": 1
+            },
+            {
+                "name": "Book B",
+                "quantity": 2
+            }
+        ]
+        self.makeOrder(data)
+
+    @task
+    def CorrectOrderB(self):
+        data = userAndFinancialData.copy()
+        data["items"]= [ {
+                "name": "Book A",
+                "quantity": 2
+            },
+            {
+                "name": "Book B",
+                "quantity": 1
+            }
+        ]
+        self.makeOrder(data)
+
+    @task
+    def CorrectOrderC(self):
+        data = userAndFinancialData.copy()
+        data["items"]= [ {
+                "name": "Book B",
+                "quantity": 3
+            },
+            {
+                "name": "Book C",
+                "quantity": 2
+            }
+        ]
+        self.makeOrder(data)
+
+    @task
+    def CorrectOrderD(self):
+        data = userAndFinancialData.copy()
+        data["items"]= [ {
+                "name": "Book A",
+                "quantity": 1
+            },
+            {
+                "name": "Book C",
+                "quantity": 2
+            }
+        ]
+        self.makeOrder(data)
 
 class WebsiteUserSingleCorrect(HttpUser):
     wait_time = between(1,2)
@@ -96,4 +190,14 @@ class WebsiteUserSingleCorrect(HttpUser):
 class WebsiteUserMultipleCorrect(HttpUser):
     wait_time = between(1, 2)
     tasks = [MultipleCorrectOrder]
+    host = "http://localhost:8081"
+
+class WebsiteUserMultipleMixed(HttpUser):
+    wait_time = between(1, 2)
+    tasks = [MultipleMixed]
+    host = "http://localhost:8081"
+
+class WebsiteUserConflictingOrders(HttpUser):
+    wait_time = between(1, 2)
+    tasks = [MultipleMixed]
     host = "http://localhost:8081"
