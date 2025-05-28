@@ -8,6 +8,8 @@ and suggestions). It combines the results and sends a response back to the front
 Sends correct orders to Order Queue Service.
 
 """
+import math
+import time
 import random
 import common_pb2 as common
 import fraud_detection_pb2 as fraud_detection
@@ -31,7 +33,17 @@ from tracing import get_tracer_and_meter, trace
 ThreadingInstrumentor().instrument()
 tracer, meter = get_tracer_and_meter('orchestrator')
 
-order_sizes = meter.create_histogram('order_sizes', description='sizes of orders (total number of books)')
+order_sizes = meter.create_histogram(
+    'order_sizes',
+    description='sizes of orders (total number of books)',
+    explicit_bucket_boundaries_advisory=[*range(0, 11, 2), math.inf]
+)
+request_durations = meter.create_histogram(
+    'request_durations',
+    description='duration of request against endpoint in milliseconds',
+    unit='ms',
+    explicit_bucket_boundaries_advisory=[*range(0, 101, 5), math.inf]
+)
 
 def check_fraud(order_id) -> fraud_detection.OrderResponse:
     # Establish a connection with the fraud-detection gRPC service.
@@ -307,21 +319,34 @@ def checkout():
     """
     Responds with a JSON object containing the order ID, status, and suggested books.
     """
+    start = time.perf_counter()
+
     # Get request object data to json
     request_data = json.loads(request.data)
     
     # Make requests to other services and return response
-    return FraudVerificationSuggestions(request_data)
+    response = FraudVerificationSuggestions(request_data)
+
+    end = time.perf_counter()
+    request_durations.record((end - start) * 1000, {'endpoint': '/checkout'})
+
+    return response
 
 @app.route('/inventory', methods=['GET'])
 def inventory():
     """
     Responds with a JSON object containing database value for each replica. For debugging purposes.
     """
+    start = time.perf_counter()
+
     book_title = request.args.get('title')
     
-    return get_inventory(book_title)
+    response = get_inventory(book_title)
 
+    end = time.perf_counter()
+    request_durations.record((end - start) * 1000, {'endpoint': '/inventory'})
+
+    return response
 
 if __name__ == '__main__':
     # Run the app in debug mode to enable hot reloading.
